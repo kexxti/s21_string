@@ -104,13 +104,9 @@ Suite *s21_strncat_suite(void) {
   return s;
 }
 
-int main(void) {
-  int number_failed;
-  Suite *s = s21_strncat_suite();
-  SRunner *sr = srunner_create(s);
-
-  srunner_run_all(sr, CK_NORMAL);
-  number_failed = srunner_ntests_failed(sr);
-  srunner_free(sr);
-  return (number_failed == 0) ? 0 : 1;
+void reset_buffers(char *dest_s21, char *dest_std, const char *initial_dest,
+                   const char **src_ptr, const char *src_str) {
+  strcpy(dest_s21, initial_dest);
+  strcpy(dest_std, initial_dest);
+  *src_ptr = src_str;
 }
