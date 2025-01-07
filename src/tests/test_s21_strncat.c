@@ -76,7 +76,7 @@ START_TEST(test_strncat_empty_src) {
 }
 END_TEST
 
-// Тест 6: Многобайтовые символы (UTF-8)
+// Тест 6: кириллица
 START_TEST(test_strncat_multibyte_chars) {
   char dest_s21[100];
   char dest_std[100];
