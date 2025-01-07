@@ -1,0 +1,42 @@
+CC=gcc
+CFLAGS =-Wall -Werror -Wextra -std=c11 -D_POSIX_C_SOURCE=200809L
+GCOV_FLAGS=--coverage
+
+LDLIBS=-lcheck
+
+SRC_FILES=$(wildcard ./string/s21*.c)
+OBJ_FILES=$(patsubst %.c,%.o, $(SRC_FILES))
+
+TARGET=s21_string
+TEST_TARGET=$(TARGET)_test
+
+LOGS_F=reports
+HTML_F=html
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+all: $(TARGET).a test gcov_report
+
+$(TARGET).a: $(OBJ_FILES)
+	ar rc $@ $^
+	ranlib $@ # in case ar doesn't have s flag
+
+test: tests/*.c $(TARGET).a
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
+	./$@
+
+gcov_report: tests/*.c $(TARGET).a
+	$(CC) $(CFLAGS) $(GCOV_FLAGS) $^ -o $(LOGS_F)/$(TEST_TARGET) $(LDLIBS)
+	./$(LOGS_F)/$(TEST_TARGET)
+	lcov -t "Test" -d $(LOGS_F) -c -o $(LOGS_F)/$(TEST_TARGET).info
+	genhtml $(LOGS_F)/$(TEST_TARGET).info -o $(HTML_F)
+
+clean:
+	rm -f $(OBJ_FILES)
+	rm -f $(TARGET).a
+	rm -f test
+	rm -rf $(HTML_F)/*
+	rm -rf $(LOGS_F)/*
+
+rebuild: clean all

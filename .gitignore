@@ -1,3 +1,8 @@
+#
+.vscode
+src/.clang-format
+src/test
+
 # Prerequisites
 *.d
 
