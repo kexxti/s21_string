@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS =-Wall -Werror -Wextra -std=c11 -D_POSIX_C_SOURCE=200809L
 GCOV_FLAGS=--coverage
 
-LDLIBS=-lcheck
+LDLIBS=-lcheck -lm -lsubunit
 
 SRC_FILES=$(wildcard ./string/s21*.c)
 OBJ_FILES=$(patsubst %.c,%.o, $(SRC_FILES))
