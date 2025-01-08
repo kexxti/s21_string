@@ -2,7 +2,6 @@
 
 #include "../string/s21_string.h"
 
-// Тест 1: n = 0
 START_TEST(test_strncat_zero_n) {
   char dest_s21[100];
   char dest_std[100];
@@ -16,7 +15,6 @@ START_TEST(test_strncat_zero_n) {
 }
 END_TEST
 
-// Тест 2: src короче n
 START_TEST(test_strncat_src_shorter_than_n) {
   char dest_s21[100];
   char dest_std[100];
@@ -31,7 +29,6 @@ START_TEST(test_strncat_src_shorter_than_n) {
 }
 END_TEST
 
-// Тест 3: src длиннее n.
 START_TEST(test_strncat_src_longer_than_n) {
   char dest_s21[100];
   char dest_std[100];
@@ -46,7 +43,6 @@ START_TEST(test_strncat_src_longer_than_n) {
 }
 END_TEST
 
-// Тест 4: dest = ""
 START_TEST(test_strncat_empty_dest) {
   char dest_s21[100];
   char dest_std[100];
@@ -61,7 +57,6 @@ START_TEST(test_strncat_empty_dest) {
 }
 END_TEST
 
-// Тест 5: src = ""
 START_TEST(test_strncat_empty_src) {
   char dest_s21[100];
   char dest_std[100];
@@ -76,8 +71,7 @@ START_TEST(test_strncat_empty_src) {
 }
 END_TEST
 
-// Тест 6: кириллица
-START_TEST(test_strncat_multibyte_chars) {
+START_TEST(test_strncat_extended_ascii) {
   char dest_s21[100];
   char dest_std[100];
   const char *src;
@@ -99,7 +93,7 @@ Suite *s21_strncat_suite(void) {
   tcase_add_test(tc_core, test_strncat_src_longer_than_n);
   tcase_add_test(tc_core, test_strncat_empty_dest);
   tcase_add_test(tc_core, test_strncat_empty_src);
-  tcase_add_test(tc_core, test_strncat_multibyte_chars);
+  tcase_add_test(tc_core, test_strncat_extended_ascii);
   suite_add_tcase(s, tc_core);
   return s;
 }
