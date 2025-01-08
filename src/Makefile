@@ -2,7 +2,12 @@ CC=gcc
 CFLAGS =-Wall -Werror -Wextra -std=c11 -D_POSIX_C_SOURCE=200809L
 GCOV_FLAGS=--coverage
 
-LDLIBS=-lcheck -lm -lsubunit
+LDLIBS=-lcheck
+
+OS = $(shell uname -s)
+ifeq ($(OS),Linux)
+	LDLIBS := $(LDLIBS) -lm -lsubunit
+endif
 
 SRC_FILES=$(wildcard ./string/s21*.c)
 OBJ_FILES=$(patsubst %.c,%.o, $(SRC_FILES))
