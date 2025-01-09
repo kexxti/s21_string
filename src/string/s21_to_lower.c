@@ -1,21 +1,22 @@
-#include "s21_string.h"
 #include <stdlib.h>
 
-void *s21_to_lower(const char *str){
-    void* res = S21_NULL;
+#include "s21_string.h"
 
-    if (str != S21_NULL){
-        s21_size_t length = s21_strlen(str) + 1;
-        res = (void *)calloc(length, sizeof(char));
+void *s21_to_lower(const char *str) {
+  void *res = S21_NULL;
 
-        for (s21_size_t i = 0; *str != '\0'; i++,str++){
-            if (*str >= 'A' && *str <= 'Z'){
-                ((char*)res)[i] = *str + 32;
-            }else {
-                ((char*)res)[i] = *str;
-            }
-        }
+  if (str != S21_NULL) {
+    s21_size_t length = s21_strlen(str) + 1;
+    res = (void *)calloc(length, sizeof(char));
+
+    for (s21_size_t i = 0; *str != '\0'; i++, str++) {
+      if (*str >= 'A' && *str <= 'Z') {
+        ((char *)res)[i] = *str + 32;
+      } else {
+        ((char *)res)[i] = *str;
+      }
     }
-    
-    return res;
+  }
+
+  return res;
 }

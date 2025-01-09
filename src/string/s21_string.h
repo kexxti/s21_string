@@ -87,4 +87,11 @@ of a set of specified characters (trim_chars) from the given string (src)
 are removed. In case of any error, return NULL.*/
 void *s21_trim(const char *src, const char *trim_chars);
 
+/* Return the length of the maximum initial segment
+of S which contains only characters in str2.  */
+s21_size_t s21_strspn(const char *str1, const char *str2);
+
+/* Works exactly the same as s21_strspn but operates from the end of str1  */
+s21_size_t s21_strrspn(const char *str1, const char *str2);
+
 #endif
