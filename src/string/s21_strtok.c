@@ -1,8 +1,8 @@
 #include "s21_string.h"
 
 char *s21_strtok(char *str, const char *delim) {
-  static char *olds;
-  char *end;
+  static char *olds = S21_NULL;
+  char *end = S21_NULL;
   if (str == S21_NULL) str = olds;
 
   if (*str == '\0') {
