@@ -9,6 +9,7 @@
 #include "test_s21_strncat.h"
 #include "test_s21_strncpy.h"
 #include "test_s21_strrchr.h"
+#include "test_s21_strstr.h"
 
 int main() {
   int number_failed;
@@ -19,6 +20,7 @@ int main() {
   srunner_add_suite(sr, s21_insert_suite());
   srunner_add_suite(sr, s21_strlen_suite());
   srunner_add_suite(sr, s21_strncpy_suite());
+  srunner_add_suite(sr, s21_strstr_suite());
 
   srunner_run_all(sr, CK_NORMAL);
   number_failed = srunner_ntests_failed(sr);
