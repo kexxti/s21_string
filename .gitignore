@@ -1,6 +1,6 @@
 #
 .vscode
-src/.clang-format
+src/**/.clang-format
 src/test
 
 # Prerequisites
