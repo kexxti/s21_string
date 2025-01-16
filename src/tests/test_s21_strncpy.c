@@ -2,7 +2,6 @@
 
 #include "../string/s21_string.h"
 
-// копирование строки в строку той же длины
 START_TEST(copy_exact_length) {
   int n = 12;
   char s21_dest[13] = "!S21_School!";
@@ -12,7 +11,6 @@ START_TEST(copy_exact_length) {
 }
 END_TEST
 
-// копирование строки в строку с обрезанием
 START_TEST(copy_with_truncation) {
   int n = 6;
   char s21_dest[7] = "School";
@@ -22,7 +20,6 @@ START_TEST(copy_with_truncation) {
 }
 END_TEST
 
-// копирование строки с добавлением '\0'
 START_TEST(copy_with_zeros) {
   int n = 15;
   char s21_dest[16] = "S21_School_Best";
@@ -32,7 +29,6 @@ START_TEST(copy_with_zeros) {
 }
 END_TEST
 
-// строка, которая полностью помещается в буфер назначения
 START_TEST(empty_src) {
   int n = 5;
   char s21_dest[6] = "12345";
@@ -42,7 +38,6 @@ START_TEST(empty_src) {
 }
 END_TEST
 
-// пустая строка в качестве исходной строки
 START_TEST(copy_into_empty_dest) {
   int n = 5;
   char s21_dest[6] = "";
@@ -52,12 +47,21 @@ START_TEST(copy_into_empty_dest) {
 }
 END_TEST
 
-// копирование пустой строки в строку с нулевой длиной
 START_TEST(copy_empty_string_to_empty_dest) {
   int n = 0;
   char s21_dest[1] = "";
   char dest[1] = "";
   char src[1] = "";
+  ck_assert_str_eq(s21_strncpy(s21_dest, src, n), strncpy(dest, src, n));
+}
+END_TEST
+
+START_TEST(last_test) {
+  int n = 12;
+  char s21_dest[13] = "!S21_School!";
+  char dest[13] = "!S21_School!";
+  char src[13] = "Hello World!";
+  src[3] = '\0';
   ck_assert_str_eq(s21_strncpy(s21_dest, src, n), strncpy(dest, src, n));
 }
 END_TEST
@@ -71,6 +75,8 @@ Suite *s21_strncpy_suite(void) {
   tcase_add_test(tc_core, empty_src);
   tcase_add_test(tc_core, copy_into_empty_dest);
   tcase_add_test(tc_core, copy_empty_string_to_empty_dest);
+  tcase_add_test(tc_core, last_test);
+
   suite_add_tcase(s, tc_core);
   return s;
 }

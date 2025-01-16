@@ -1,7 +1,6 @@
 
 #include "test_s21_strlen.h"
 
-// Тест 1: пустая строка
 START_TEST(test_strlen_empty_string) {
   char s21_str[] = "";
   char std_str[] = "";
@@ -9,7 +8,6 @@ START_TEST(test_strlen_empty_string) {
 }
 END_TEST
 
-// Тест 2: небольшая строка
 START_TEST(test_strlen_usual_string) {
   char s21_str[] = "Hello";
   char std_str[] = "Hello";
@@ -17,7 +15,6 @@ START_TEST(test_strlen_usual_string) {
 }
 END_TEST
 
-// Тест 3: cтрока с пробелами и символами
 START_TEST(test_strlen_with_spaces) {
   char s21_str[] = "\tHello world!\n";
   char std_str[] = "\tHello world!\n";
@@ -25,7 +22,6 @@ START_TEST(test_strlen_with_spaces) {
 }
 END_TEST
 
-// Тест 4: кириллица
 START_TEST(test_strlen_rus) {
   char s21_str[] = "Я пошел в школу 21";
   char std_str[] = "Я пошел в школу 21";
@@ -33,7 +29,6 @@ START_TEST(test_strlen_rus) {
 }
 END_TEST
 
-// Тест 5: длинная строка
 START_TEST(test_strlen_long_string) {
   char s21_str[] =
       "For almost a year, a group of the brightest mathematicians, linguists, "
