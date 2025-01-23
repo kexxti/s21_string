@@ -8,7 +8,13 @@ START_TEST(test_memcmp_equal_string) {
   strcpy(str1, "123456");
   strcpy(str2, "123456");
   s21_size_t n = 6;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -16,7 +22,13 @@ START_TEST(test_memcmp_NULL_zero_length) {
   char *str1 = NULL;
   char *str2 = NULL;
   s21_size_t n = 0;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -24,7 +36,13 @@ START_TEST(test_memcmp_diff_beginning) {
   char str1[] = "ABCDEF";
   char str2[] = "XBCDEF";
   s21_size_t n = 6;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -32,7 +50,13 @@ START_TEST(test_memcmp_diff_middle) {
   char str1[] = "ABCDEFGH";
   char str2[] = "ABCDZFGH";
   s21_size_t n = 8;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -40,7 +64,13 @@ START_TEST(test_memcmp_diff_end) {
   char str1[] = "ABCDEf";
   char str2[] = "ABCDEg";
   s21_size_t n = 6;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -48,15 +78,13 @@ START_TEST(test_memcmp_zero_length) {
   char str1[] = "Hello";
   char str2[] = "World";
   s21_size_t n = 0;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
-}
-END_TEST
-
-START_TEST(test_memcmp_large_n) {
-  char str1[] = "12345";
-  char str2[] = "12349";
-  s21_size_t n = 100;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -64,7 +92,13 @@ START_TEST(test_memcmp_binary) {
   unsigned char str1[] = {0x00, 0x01, 0x02, 0xFF, 0x10, 0x11};
   unsigned char str2[] = {0x00, 0x01, 0x02, 0xF0, 0x10, 0x11};
   s21_size_t n = 6;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -72,7 +106,13 @@ START_TEST(test_memcmp_equal_binary) {
   unsigned char str1[] = {0x00, 0x01, 0x02, 0xFF, 0x10, 0x11};
   unsigned char str2[] = {0x00, 0x01, 0x02, 0xFF, 0x10, 0x11};
   s21_size_t n = 6;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -84,7 +124,13 @@ START_TEST(test_memcmp_equal_long_array) {
     str2[i] = i;
   }
   s21_size_t n = 1000;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -97,7 +143,13 @@ START_TEST(test_memcmp_long_array) {
   }
   str1[555] = 99999;
   s21_size_t n = 1000;
-  ck_assert_int_eq(memcmp(str1, str2, n), s21_memcmp(str1, str2, n));
+  int std = 0;
+  int s21 = 0;
+  if (memcmp(str1, str2, n) > 0) std = 1;
+  if (memcmp(str1, str2, n) < 0) std = -1;
+  if (s21_memcmp(str1, str2, n) > 0) s21 = 1;
+  if (s21_memcmp(str1, str2, n) < 0) s21 = -1;
+  ck_assert_int_eq(std, s21);
 }
 END_TEST
 
@@ -110,7 +162,6 @@ Suite *s21_memcmp_suite(void) {
   tcase_add_test(tc_core, test_memcmp_diff_middle);
   tcase_add_test(tc_core, test_memcmp_diff_end);
   tcase_add_test(tc_core, test_memcmp_zero_length);
-  tcase_add_test(tc_core, test_memcmp_large_n);
   tcase_add_test(tc_core, test_memcmp_binary);
   tcase_add_test(tc_core, test_memcmp_equal_binary);
   tcase_add_test(tc_core, test_memcmp_equal_long_array);
