@@ -31,7 +31,7 @@ test: tests/*.c $(TARGET).a
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 	./$@
 
-gcov_report: tests/*.c $(TARGET).a
+gcov_report: tests/*.c $(SRC_FILES)
 	$(CC) $(CFLAGS) $(GCOV_FLAGS) $^ -o $(LOGS_F)/$(TEST_TARGET) $(LDLIBS)
 	./$(LOGS_F)/$(TEST_TARGET)
 	lcov -t "Test" -d $(LOGS_F) -c -o $(LOGS_F)/$(TEST_TARGET).info
