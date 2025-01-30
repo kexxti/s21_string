@@ -504,7 +504,73 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(res, 1);
   ck_assert_str_eq(str, "ipsum");
 
+  str[0] = '\0';
+  res = sscanf("Lorem", "%s%s", str, str);
+  ck_assert_int_eq(res, 1);
+  ck_assert_str_eq(str, "Lorem");
+
   // pointers
+  void *pp2 = (void *)0x80af1465;
+  void *pp1;
+  res = sscanf("0x80af1465", "%p", &pp1);
+  ck_assert_ptr_eq(pp1, pp2);
+  ck_assert_int_eq(res, 1);
+
+  pp2 = NULL;
+  res = sscanf("0", "%p", &pp1);
+  ck_assert_ptr_eq(pp1, pp2);
+  ck_assert_int_eq(res, 1);
+
+  pp2 = (void *)0xFFFFFFFF;
+  res = sscanf("0xFFFFFFFF", "%p", &pp1);
+  ck_assert_ptr_eq(pp1, pp2);
+  ck_assert_int_eq(res, 1);
+
+  pp2 = pp1 = (void *)1;
+  res = sscanf("-0x1", "%p", &pp1);  // yes it works
+  ck_assert_ptr_ne(pp1, pp2);
+  ck_assert_int_eq(res, 1);
+
+  // number
+  ch1 = ch2 = ch3 = '\0';
+  res = sscanf(" a   bc", " %c\n%c%n%c", &ch1, &ch2, &value, &ch3);
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, 'b');
+  ck_assert_int_eq(ch3, 'c');
+  ck_assert_int_eq(value, 6);  // counts not written values but read chars (even
+                               // ignored whitespaces)
+  ck_assert_int_eq(res, 3);    // and doesn't add to overall counter
+
+  ch1 = ch2 = ch3 = '\0';
+  res = sscanf(" a   bc", "%n %c\n%c%c", &value, &ch1, &ch2, &ch3);
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, 'b');
+  ck_assert_int_eq(ch3, 'c');
+  ck_assert_int_eq(value, 0);  // not EOF by default
+  ck_assert_int_eq(res, 3);
+
+  ch1 = ch2 = ch3 = '\0';
+  res = sscanf("  a   bc", " %n %c\n%c%c", &value, &ch1, &ch2, &ch3);
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, 'b');
+  ck_assert_int_eq(ch3, 'c');
+  ck_assert_int_eq(value, 2);  // but for some reason counts skipped whitespaces
+  ck_assert_int_eq(res, 3);
+
+  ch1 = ch2 = ch3 = '\0';
+  res = sscanf("a      ", "%c%c%c%n", &ch1, &ch2, &ch3, &value);
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, ' ');
+  ck_assert_int_eq(ch3, ' ');
+  ck_assert_int_eq(value, 3);  // ^^^ and only if they are skipped ^^^
+  ck_assert_int_eq(res, 3);
+
+  // symbols and percent
+  ch1 = ch2 = ch3 = '\0';
+  str[0] = '\0';
+  res = sscanf("Lorem \n\t  ipsum% dolor sit amet", "%*s\tipsum%%%s", str);
+  ck_assert_str_eq(str, "dolor");
+  ck_assert_int_eq(res, 1);
 }
 END_TEST
 
