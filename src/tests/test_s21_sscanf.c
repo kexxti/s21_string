@@ -1,5 +1,8 @@
 #include "test_s21_sscanf.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "../string/s21_sscanf.h"
 #include "../string/s21_string.h"
 
@@ -47,16 +50,16 @@ START_TEST(test_sscanf_get_modifier) {
   ck_assert_uint_eq(res_float_upper_g, FLOAT);
 
   MODIFIER res_octal = get_modifier('o');
-  ck_assert_uint_eq(res_octal, OCTAL);
+  ck_assert_uint_eq(res_octal, UOCTAL);
   MODIFIER res_string = get_modifier('s');
   ck_assert_uint_eq(res_string, STRING);
   MODIFIER res_udecimal = get_modifier('u');
   ck_assert_uint_eq(res_udecimal, UDECIMAL);
 
   MODIFIER res_uhex = get_modifier('x');
-  ck_assert_uint_eq(res_uhex, HEX);
+  ck_assert_uint_eq(res_uhex, UHEX);
   MODIFIER res_upper_uhex = get_modifier('X');
-  ck_assert_uint_eq(res_upper_uhex, HEX);
+  ck_assert_uint_eq(res_upper_uhex, UHEX);
 
   MODIFIER res_pointer = get_modifier('p');
   ck_assert_uint_eq(res_pointer, POINTER);
@@ -172,7 +175,7 @@ START_TEST(test_sscanf_formats) {
   read_format(&format, f1);
   f2->ignore_whitespaces = true;
   f2->ignore = true;
-  f2->type_modifier = HEX;
+  f2->type_modifier = UHEX;
   res = compare_formats(f1, f2);
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, "%*9ld.o %%\n f");
@@ -255,6 +258,13 @@ START_TEST(test_default_sscanf) {
   res = sscanf("-123", "\n %d", &value);
   ck_assert_int_eq(value, -123);
   ck_assert_int_eq(res, 1);
+
+  value = 1;
+  int value2 = 8;
+  res = sscanf("-", "%d%n", &value, &value2);
+  ck_assert_int_eq(value, 1);
+  ck_assert_int_eq(value2, 8);
+  ck_assert_int_eq(res, 0);
 
   // octal
   value = 0;
@@ -354,6 +364,26 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(ch3, 'c');
   ck_assert_int_eq(res, 3);
 
+  ch1 = ch2 = '\0';
+  res = sscanf("a", "%c%c", &ch1, &ch2);  // NULL_TERMINATOR
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, '\0');
+  ck_assert_int_eq(res, 1);
+
+  ch1 = ch2 = ch3 = '\0';
+  res = sscanf("a bc", "%2c%2c%c", &ch1, &ch2, &ch3);  // sum of width < length
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, 'b');  // F read by %2c
+  ck_assert_int_eq(ch3, 'c');
+  ck_assert_int_eq(res, 2);  // <-- width with chars is strange
+
+  ch1 = ch2 = ch3 = '\0';
+  res = sscanf("aFbc", "%5c%c%c", &ch1, &ch2, &ch3);  // sum of width > length
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, 'F');  // F not read
+  ck_assert_int_eq(ch3, 'b');
+  ck_assert_int_eq(res, 1);  // <-- like why
+
   // hex and octal with OOB
   value = 0;
   int remain = 0;
@@ -386,8 +416,11 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(res, 1);
 
   uint32_t uval = 1;
-  res = sscanf("-10", "%u", &uval);  // JUST WHY
+  res = sscanf("-10", "%u", &uval);  // kinda funny
   ck_assert_int_eq(uval, 4294967286);
+  ck_assert_int_ne(uval, -10);
+  ck_assert_uint_eq(uval, 4294967286);
+  ck_assert_uint_ne(uval, -10);
   ck_assert_int_eq(res, 1);
 
   // floats
@@ -453,7 +486,7 @@ START_TEST(test_default_sscanf) {
   // double
 
   double dval = 1;
-  res = sscanf("1.2E128", "%lf", &dval);  // WHAT IS GOING ON
+  res = sscanf("1.2E128", "%lf", &dval);
   ck_assert_double_eq(dval, 1.2E128);
   ck_assert_double_ne(dval, INFINITY);
   ck_assert_int_eq(res, 1);
@@ -565,12 +598,138 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(value, 3);  // ^^^ and only if they are skipped ^^^
   ck_assert_int_eq(res, 3);
 
+  ch1 = ch2 = ch3 = '\0';
+  value = 0;
+  res = sscanf("a bc", "%2c%n%2c%c", &ch1, &value, &ch2, &ch3);
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, 'b');
+  ck_assert_int_eq(ch3, 'c');
+  ck_assert_int_eq(value, 2);
+  ck_assert_int_eq(res, 2);
+
+  ch1 = ch2 = ch3 = '\0';
+  value = 0;
+  value2 = 0;
+  res = sscanf("aFbc", "%5c%n%c%c%n", &ch1, &value, &ch2, &ch3, &value2);
+  ck_assert_int_eq(ch1, 'a');
+  ck_assert_int_eq(ch2, 'F');
+  ck_assert_int_eq(ch3, 'b');
+  ck_assert_int_eq(value, 4);
+  ck_assert_int_eq(value2, 0);
+  ck_assert_int_eq(res, 1);
+
   // symbols and percent
   ch1 = ch2 = ch3 = '\0';
   str[0] = '\0';
   res = sscanf("Lorem \n\t  ipsum% dolor sit amet", "%*s\tipsum%%%s", str);
   ck_assert_str_eq(str, "dolor");
   ck_assert_int_eq(res, 1);
+
+  // limits
+  value = 0;
+  res = sscanf("-2147483648", "%d", &value);
+  ck_assert_int_eq(value, INT32_MIN);
+  ck_assert_int_eq(res, 1);
+
+  value = 0;
+  res = sscanf("2147483647", "%d", &value);
+  ck_assert_int_eq(value, INT32_MAX);
+  ck_assert_int_eq(res, 1);
+
+  value = 0;
+  res = sscanf("2147483648", "%d", &value);
+  ck_assert_int_eq(value, INT32_MIN);
+  ck_assert_int_eq(res, 1);
+
+  value = 0;
+  res = sscanf("-2147483649", "%d", &value);
+  ck_assert_int_eq(value, INT32_MAX);
+  ck_assert_int_eq(res, 1);
+}
+END_TEST
+
+START_TEST(test_custom_atoi) {
+  char str[100];
+  char *str2;
+  strcpy(str, "123");
+  str2 = strdup(str);
+  char *temp = str2;
+  int value = s21_atoi((const char **)&str2, NULL, NULL);
+  int value2 = atoi(str);
+  ck_assert_int_eq(value, 123);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "-123");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, -123);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "00123");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, 123);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "-00123");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, -123);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "2147483647");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, INT32_MAX);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "-2147483648");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, INT32_MIN);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "-2147483649");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, INT32_MAX);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "2147483648");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, INT32_MIN);
+  ck_assert_int_eq(value, value2);
+  free(temp);
+
+  strcpy(str, "781235671236758");
+  str2 = strdup(str);
+  temp = str2;
+  value = s21_atoi((const char **)&str2, NULL, NULL);
+  value2 = atoi(str);
+  ck_assert_int_eq(value, value2);
+  free(temp);
 }
 END_TEST
 
@@ -580,6 +739,7 @@ Suite *s21_sscanf_suite(void) {
   tcase_add_test(tc_inner, test_sscanf_get_length);
   tcase_add_test(tc_inner, test_sscanf_get_modifier);
   tcase_add_test(tc_inner, test_sscanf_get_width);
+  tcase_add_test(tc_inner, test_custom_atoi);
   suite_add_tcase(s, tc_inner);
 
   TCase *tc_formats = tcase_create("Format filling");

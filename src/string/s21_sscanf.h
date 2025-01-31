@@ -13,13 +13,13 @@ typedef enum MODIFIER {
   DECIMAL,
   INTEGER,
   FLOAT,
-  OCTAL,
+  UOCTAL,
   STRING,
   UDECIMAL,
-  HEX,
+  UHEX,
   POINTER,
   NUMBER,
-  PERCENT
+  PERCENT  // can't ignore it, behaves as normal symbol
 } MODIFIER;
 typedef enum LENGTH { NONE, SHORT, LONG, EXTENDED_DOUBLE } LENGTH;
 typedef struct current_format {
@@ -38,8 +38,12 @@ void fill_format_default(current_format* settings);
 void read_format(const char** format, current_format* settings);
 LENGTH get_length(const char ch);
 MODIFIER get_modifier(const char ch);
-s21_size_t get_width(const char** format);  // is 0 == any?
-int s21_sscanf([[maybe_unused]] const char* str,
-               [[maybe_unused]] const char* format, ...);
+s21_size_t get_width(const char** format);
+bool is_negative_ato(const char** str, int* read_count);
+int s21_atoi(const char** str, int* read_count, bool* is_scan_succeded);
+short int s21_atosi(const char** str, int* read_count, bool* is_scan_succeded);
+long int s21_atol(const char** str, int* read_count, bool* is_scan_succeded);
+
+int s21_sscanf(const char* str, const char* format, ...);
 
 #endif
