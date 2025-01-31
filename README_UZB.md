@@ -140,7 +140,7 @@ bunda:
 
 | № | Kenglik | Tavsif |
 | --- | --- | --- |
-| 1	| (son) | Chop etiluvchi belgilarning minimal soni. Agar chiqish qiymati bu raqamdan qisqaroq bo'lsa, natija bo'sh joylar bilan to'ldiriladi. Natija kattaroq bo'lsa ham, qiymat qisqartirilmaydi. |
+| 1	| (son) | sprintf tomonidan chop etiluvchi belgilarning minimal soni. Agar chiqish qiymati bu raqamdan qisqaroq bo'lsa, natija bo'sh joylar bilan to'ldiriladi. Natija kattaroq bo'lsa ham, qiymat qisqartirilmaydi. sscanf uchun bu maydon uchun o'qiladigan belgilarning maksimal soni. |
 | 2 | * | sprintf da * belgisi kenglik format satrida emas, balki formatlantirish lozim bo’lgan argument oldidagi butun son qiymatining qo'shimcha argumenti sifatida ko’rsatilishini bildiradi. sscanf da % dan keyin va format spetsifikatoridan oldin qo'yilgan * belgisi, ko’rsatilgan turdagi ma'lumotlarni hisoblaydi, lekin ularning o’zlashtirilishini bostiradi. |
 
 ### sprintf Aniqlik
