@@ -201,12 +201,22 @@ bool get_char(const char** str, current_format* settings, void* dest,
               int* read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
-  char ch = (*str)[0];
-  if (ch) {
-    is_scan_succeded = true;
-    (*str)++;
-    (*read_bytes_count)++;
-    if (!settings->ignore) *((char*)dest) = ch;
+  if (settings->length_modifier == NONE) {
+    char ch = **str;
+    if (ch) {
+      is_scan_succeded = true;
+      (*str)++;
+      (*read_bytes_count)++;
+      if (!settings->ignore) *((char*)dest) = ch;
+    }
+  } else if (settings->length_modifier == LONG) {
+    wchar_t ch = **str;
+    if (ch) {
+      is_scan_succeded = true;
+      (*str)++;
+      (*read_bytes_count)++;
+      if (!settings->ignore) *((wchar_t*)dest) = ch;
+    }
   }
   return is_scan_succeded;
 }

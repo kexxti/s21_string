@@ -1552,6 +1552,14 @@ START_TEST(test_s21_sscanf) {
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
+  pp2_def = pp2_s21 = (void *)0x0;
+  res_def = sscanf("0x", "%p", &pp1_def);
+  res_s21 = s21_sscanf("0x", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
+
   // width with minus
   value_def = value_s21 = 0;
   res_def = sscanf("-123456789", "%5d", &value_def);
@@ -1653,6 +1661,15 @@ START_TEST(test_s21_sscanf) {
   ck_assert_int_eq(res_s21, 1);
   ck_assert_int_eq(value_def, value_s21);
   ck_assert_int_eq(num_def, num_s21);
+
+  // wide chars
+  wchar_t wc_def = 0;
+  wchar_t wc_s21 = 0;
+  res_def = sscanf("a", "%lc", &wc_def);
+  res_s21 = s21_sscanf("a", "%lc", &wc_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(wc_def, wc_s21);
 }
 END_TEST
 
