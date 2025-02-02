@@ -71,6 +71,8 @@ bool get_uoctal(const char** str, current_format* settings, void* dest,
                 int* read_bytes_count);
 void skip_hex_prefix(s21_size_t* length, const char** str,
                      current_format* settings, int* read_bytes_count);
+bool skip_hex_atoi_prefixes(s21_size_t* length, const char** str,
+                            current_format* settings, int* read_bytes_count);
 int s21_a_to_hexi(const char** str, current_format* settings,
                   int* read_bytes_count, bool* is_scan_succeded);
 short int s21_a_to_hexsi(const char** str, current_format* settings,

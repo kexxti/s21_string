@@ -230,9 +230,10 @@ void atoi_move_to_next(s21_size_t* length, const char** str,
 }
 int s21_atoi(const char** str, current_format* settings, int* read_bytes_count,
              bool* is_scan_succeded) {
-  bool negative = is_negative_ato(str, read_bytes_count);
   int result = 0;
   s21_size_t length = 0;
+  bool negative = is_negative_ato(str, read_bytes_count);
+  if (negative) length++;
   while (isdigit(**str) && (length < settings->width || !settings->width)) {
     result = result * 10 + (**str - '0');
     atoi_move_to_next(&length, str, read_bytes_count, is_scan_succeded);
@@ -243,9 +244,10 @@ int s21_atoi(const char** str, current_format* settings, int* read_bytes_count,
 
 short int s21_atosi(const char** str, current_format* settings,
                     int* read_bytes_count, bool* is_scan_succeded) {
-  bool negative = is_negative_ato(str, read_bytes_count);
   short int result = 0;
   s21_size_t length = 0;
+  bool negative = is_negative_ato(str, read_bytes_count);
+  if (negative) length++;
   while (isdigit(**str) && (length < settings->width || !settings->width)) {
     result = result * 10 + (**str - '0');
     atoi_move_to_next(&length, str, read_bytes_count, is_scan_succeded);
@@ -256,9 +258,10 @@ short int s21_atosi(const char** str, current_format* settings,
 
 long int s21_atol(const char** str, current_format* settings,
                   int* read_bytes_count, bool* is_scan_succeded) {
-  bool negative = is_negative_ato(str, read_bytes_count);
   long int result = 0;
   s21_size_t length = 0;
+  bool negative = is_negative_ato(str, read_bytes_count);
+  if (negative) length++;
   while (isdigit(**str) && (length < settings->width || !settings->width)) {
     result = result * 10 + (**str - '0');
     atoi_move_to_next(&length, str, read_bytes_count, is_scan_succeded);
@@ -317,9 +320,10 @@ bool get_udecimal(const char** str, current_format* settings, void* dest,
 
 int s21_a_to_octali(const char** str, current_format* settings,
                     int* read_bytes_count, bool* is_scan_succeded) {
-  bool negative = is_negative_ato(str, read_bytes_count);
   int result = 0;
   s21_size_t length = 0;
+  bool negative = is_negative_ato(str, read_bytes_count);
+  if (negative) length++;
   while (**str < '8' && **str >= '0' &&
          (length < settings->width || !settings->width)) {
     result = result * 8 + (**str - '0');
@@ -330,9 +334,10 @@ int s21_a_to_octali(const char** str, current_format* settings,
 }
 short int s21_a_to_octalsi(const char** str, current_format* settings,
                            int* read_bytes_count, bool* is_scan_succeded) {
-  bool negative = is_negative_ato(str, read_bytes_count);
   short int result = 0;
   s21_size_t length = 0;
+  bool negative = is_negative_ato(str, read_bytes_count);
+  if (negative) length++;
   while (**str < '8' && **str >= '0' &&
          (length < settings->width || !settings->width)) {
     result = result * 8 + (**str - '0');
@@ -343,9 +348,10 @@ short int s21_a_to_octalsi(const char** str, current_format* settings,
 }
 long int s21_a_to_octall(const char** str, current_format* settings,
                          int* read_bytes_count, bool* is_scan_succeded) {
-  bool negative = is_negative_ato(str, read_bytes_count);
   long int result = 0;
   s21_size_t length = 0;
+  bool negative = is_negative_ato(str, read_bytes_count);
+  if (negative) length++;
   while (**str < '8' && **str >= '0' &&
          (length < settings->width || !settings->width)) {
     result = result * 8 + (**str - '0');
@@ -389,11 +395,20 @@ void skip_hex_prefix(s21_size_t* length, const char** str,
   }
 }
 
+bool skip_hex_atoi_prefixes(s21_size_t* length, const char** str,
+                            current_format* settings, int* read_bytes_count) {
+  bool negative = is_negative_ato(str, read_bytes_count);
+  if (negative) (*length)++;
+  skip_hex_prefix(length, str, settings, read_bytes_count);
+  return negative;
+}
+
 int s21_a_to_hexi(const char** str, current_format* settings,
                   int* read_bytes_count, bool* is_scan_succeded) {
   int result = 0;
   s21_size_t length = 0;
-  skip_hex_prefix(&length, str, settings, read_bytes_count);
+  bool negative =
+      skip_hex_atoi_prefixes(&length, str, settings, read_bytes_count);
   while (((tolower(**str) <= 'f' && tolower(**str) >= 'a') || isdigit(**str)) &&
          (length < settings->width || !settings->width)) {
     result = result * 16;
@@ -403,13 +418,15 @@ int s21_a_to_hexi(const char** str, current_format* settings,
       result += (tolower(**str) - 'a' + 10);
     atoi_move_to_next(&length, str, read_bytes_count, is_scan_succeded);
   }
+  if (negative) result *= -1;
   return result;
 }
 short int s21_a_to_hexsi(const char** str, current_format* settings,
                          int* read_bytes_count, bool* is_scan_succeded) {
   short int result = 0;
   s21_size_t length = 0;
-  skip_hex_prefix(&length, str, settings, read_bytes_count);
+  bool negative =
+      skip_hex_atoi_prefixes(&length, str, settings, read_bytes_count);
   while (((tolower(**str) <= 'f' && tolower(**str) >= 'a') || isdigit(**str)) &&
          (length < settings->width || !settings->width)) {
     result = result * 16;
@@ -419,13 +436,15 @@ short int s21_a_to_hexsi(const char** str, current_format* settings,
       result += (tolower(**str) - 'a' + 10);
     atoi_move_to_next(&length, str, read_bytes_count, is_scan_succeded);
   }
+  if (negative) result *= -1;
   return result;
 }
 long int s21_a_to_hexl(const char** str, current_format* settings,
                        int* read_bytes_count, bool* is_scan_succeded) {
   long int result = 0;
   s21_size_t length = 0;
-  skip_hex_prefix(&length, str, settings, read_bytes_count);
+  bool negative =
+      skip_hex_atoi_prefixes(&length, str, settings, read_bytes_count);
   while (((tolower(**str) <= 'f' && tolower(**str) >= 'a') || isdigit(**str)) &&
          (length < settings->width || !settings->width)) {
     result = result * 16;
@@ -435,6 +454,7 @@ long int s21_a_to_hexl(const char** str, current_format* settings,
       result += (tolower(**str) - 'a' + 10);
     atoi_move_to_next(&length, str, read_bytes_count, is_scan_succeded);
   }
+  if (negative) result *= -1;
   return result;
 }
 
@@ -442,34 +462,32 @@ bool get_uhex(const char** str, current_format* settings, void* dest,
               int* read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
-  bool negative = is_negative_ato(str, read_bytes_count);
+
   bool has_prefix = false;
   if (s21_strlen(*str) >= 2 && (*str)[0] == '0' &&
       ((*str)[1] == 'x' || (*str)[1] == 'X'))
     has_prefix = true;
+
   if (settings->length_modifier == NONE) {
     unsigned int value =
         s21_a_to_hexi(str, settings, read_bytes_count, &is_scan_succeded);
-    if (is_scan_succeded && !settings->ignore) {
-      if (negative) value *= -1;
+    if (is_scan_succeded && !settings->ignore)
       *(unsigned int*)dest = value;
-    } else if (has_prefix && !settings->ignore)
+    else if (has_prefix && !settings->ignore)
       *(unsigned int*)dest = 0;
   } else if (settings->length_modifier == SHORT) {
     unsigned short int value =
         s21_a_to_hexsi(str, settings, read_bytes_count, &is_scan_succeded);
-    if (is_scan_succeded && !settings->ignore) {
-      if (negative) value *= -1;
+    if (is_scan_succeded && !settings->ignore)
       *(unsigned short int*)dest = value;
-    } else if (has_prefix && !settings->ignore)
+    else if (has_prefix && !settings->ignore)
       *(unsigned short int*)dest = 0;
   } else if (settings->length_modifier == LONG) {
     unsigned long int value =
         s21_a_to_hexl(str, settings, read_bytes_count, &is_scan_succeded);
-    if (is_scan_succeded && !settings->ignore) {
-      if (negative) value *= -1;
+    if (is_scan_succeded && !settings->ignore)
       *(unsigned long int*)dest = value;
-    } else if (has_prefix && !settings->ignore)
+    else if (has_prefix && !settings->ignore)
       *(unsigned long int*)dest = 0;
   }
   if (has_prefix) is_scan_succeded = true;
@@ -526,13 +544,11 @@ bool get_pointer(const char** str, current_format* settings, void** dest,
                  int* read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
-  bool negative = is_negative_ato(str, read_bytes_count);
   bool has_prefix = false;
   if (**str == '0') has_prefix = true;
-  unsigned long int value = s21_a_to_hexl(
+  unsigned long int value = (unsigned long int)s21_a_to_hexl(
       str, settings, read_bytes_count, &is_scan_succeded);  // it's always hex
   if (is_scan_succeded && !settings->ignore) {
-    if (negative) value *= -1;
     *dest = (void*)value;
   } else if (has_prefix && !settings->ignore)
     *dest = (void*)0;
