@@ -528,16 +528,17 @@ START_TEST(test_default_sscanf) {
   ck_assert_double_ne(dval, fval);
 
   // ext float
-
-  long double ldval = 1;
-  dval = 1;
-  const char *really_long_float_string =
-      "5.5191891511164412412341241234351918915111644124123412412343";
-  res = sscanf(really_long_float_string, "%Lf", &ldval);
-  ck_assert_int_eq(res, 1);
-  res = sscanf(really_long_float_string, "%lf", &dval);
-  ck_assert_int_eq(res, 1);
-  ck_assert_ldouble_ne(ldval, dval);
+  if (sizeof(double) != sizeof(long double)) {
+    long double ldval = 1;
+    dval = 1;
+    const char *really_long_float_string =
+        "5.5191891511164412412341241234351918915111644124123412412343";
+    res = sscanf(really_long_float_string, "%Lf", &ldval);
+    ck_assert_int_eq(res, 1);
+    res = sscanf(really_long_float_string, "%lf", &dval);
+    ck_assert_int_eq(res, 1);
+    ck_assert_ldouble_ne(ldval, dval);
+  }
 
   // extra
   fval = 1;
