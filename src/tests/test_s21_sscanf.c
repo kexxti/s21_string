@@ -539,7 +539,6 @@ START_TEST(test_default_sscanf) {
     ck_assert_int_eq(res, 1);
     ck_assert_ldouble_ne(ldval, dval);
   }
-
   // extra
   fval = 1;
   res = sscanf(".02.3", "%*f%f", &fval);
@@ -654,6 +653,13 @@ START_TEST(test_default_sscanf) {
   res = sscanf("-2147483649", "%d", &value);
   ck_assert_int_eq(value, INT32_MAX);
   ck_assert_int_eq(res, 1);
+
+  // whitespaces skipping
+  value = value2 = 0;
+  res = sscanf("  123   \n\t546", "%d%d", &value, &value2);
+  ck_assert_int_eq(value, 123);
+  ck_assert_int_eq(value2, 546);
+  ck_assert_int_eq(res, 2);
 }
 END_TEST
 
@@ -1346,6 +1352,97 @@ START_TEST(test_s21_sscanf) {
   ck_assert_int_eq(res_s21, 1);
   ck_assert_int_eq(long_value_def, 0);
   ck_assert_int_eq(long_value_s21, 0);
+
+  // strings
+  char str_def[100];
+  char str_s21[100];
+  const char *text = "Lorem \n  ipsum dolor sit amet";
+  res_def = sscanf(text, "%s", str_def);
+  res_s21 = s21_sscanf(text, "%s", str_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_str_eq(str_def, "Lorem");
+  ck_assert_str_eq(str_s21, "Lorem");
+
+  str_def[0] = str_s21[0] = '\0';
+  res_def = sscanf(text, "%20s", str_def);
+  res_s21 = s21_sscanf(text, "%20s", str_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_str_eq(str_def, "Lorem");
+  ck_assert_str_eq(str_s21, "Lorem");
+
+  str_def[0] = str_s21[0] = '\0';
+  res_def = sscanf(text, "%3s", str_def);
+  res_s21 = s21_sscanf(text, "%3s", str_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_str_eq(str_def, "Lor");
+  ck_assert_str_eq(str_s21, "Lor");
+
+  str_def[0] = str_s21[0] = '\0';
+  res_def = sscanf("Lorem", "%s%s", str_def, str_def);
+  res_s21 = s21_sscanf("Lorem", "%s%s", str_s21, str_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_str_eq(str_def, "Lorem");
+  ck_assert_str_eq(str_s21, "Lorem");
+
+  // ingoring scan result
+  int num_def = 0;
+  int num_s21 = 0;
+  res_def = sscanf("1234 5678 9123", "%*d%d%d", &num_def, &value_def);
+  res_s21 = s21_sscanf("1234 5678 9123", "%*d%d%d", &num_s21, &value_s21);
+  ck_assert_int_eq(res_def, 2);
+  ck_assert_int_eq(res_s21, 2);
+  ck_assert_int_eq(num_def, 5678);
+  ck_assert_int_eq(num_s21, 5678);
+  ck_assert_int_eq(value_def, 9123);
+  ck_assert_int_eq(value_s21, 9123);
+
+  num_def = num_s21 = 1;
+  res_def = sscanf("1234", "%*d%d", &num_def);
+  res_s21 = s21_sscanf("1234", "%*d%d", &num_s21);
+  ck_assert_int_eq(res_def, EOF);
+  ck_assert_int_eq(res_s21, EOF);
+  ck_assert_int_eq(num_def, 1);
+  ck_assert_int_eq(num_s21, 1);
+
+  num_def = num_s21 = 1;
+  res_def = sscanf("1234 5678 9123", "%d%*d%d", &num_def, &value_def);
+  res_s21 = s21_sscanf("1234 5678 9123", "%d%*d%d", &num_s21, &value_s21);
+  ck_assert_int_eq(res_def, 2);
+  ck_assert_int_eq(res_s21, 2);
+  ck_assert_int_eq(num_def, 1234);
+  ck_assert_int_eq(num_s21, 1234);
+  ck_assert_int_eq(value_def, 9123);
+  ck_assert_int_eq(value_s21, 9123);
+
+  res_def = sscanf("1234 5678 9123", "%*d%*d%*d");
+  res_s21 = s21_sscanf("1234 5678 9123", "%*d%*d%*d");
+  ck_assert_int_eq(res_def, 0);
+  ck_assert_int_eq(res_s21, 0);
+
+  str_def[0] = str_s21[0] = '\0';
+  res_def = sscanf(text, "%*s%s", str_def);
+  res_s21 = s21_sscanf(text, "%*s%s", str_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_str_eq(str_def, "ipsum");
+  ck_assert_str_eq(str_s21, "ipsum");
+
+  // symbols and percent
+  ch1_def = ch2_def = ch3_def = '\0';
+  ch1_s21 = ch2_s21 = ch3_s21 = '\0';
+  str_def[0] = str_s21[0] = '\0';
+  res_def =
+      sscanf("Lorem \n\t  ipsum% dolor sit amet", "%*s\tipsum%%%s", str_def);
+  res_s21 = s21_sscanf("Lorem \n\t  ipsum% dolor sit amet", "%*s\tipsum%%%s",
+                       str_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_str_eq(str_def, "dolor");
+  ck_assert_str_eq(str_s21, "dolor");
 }
 END_TEST
 
