@@ -16,7 +16,8 @@ int s21_sscanf(const char* str, const char* format, ...) {
     if (needs_dest(settings)) dest = get_next_dest(settings, args);
     const char* temp = str;  // to track EOF
     is_scan_failed = !get_input(&str, settings, dest, &read_bytes_count);
-    if (!is_scan_failed && !settings->is_symbol && !settings->ignore)
+    if (!is_scan_failed && !settings->is_symbol && !settings->ignore &&
+        settings->type_modifier != NUMBER)
       successful_scans_count++;
     if (temp == str && s21_strlen(temp) == 0) should_return_EOF = true;
   }
@@ -120,7 +121,8 @@ void normalize_format(current_format* settings) {
     settings->is_symbol = true;
     settings->matching_symbol = '%';
   }
-  if (!settings->is_symbol && settings->type_modifier != CHAR)
+  if (!settings->is_symbol && settings->type_modifier != CHAR &&
+      settings->type_modifier != NUMBER)
     settings->ignore_whitespaces = true;
 }
 
@@ -487,6 +489,15 @@ bool get_string(const char** str, current_format* settings, void* dest,
   return is_scan_succeded;
 }
 
+bool get_number(const char** str, current_format* settings, void* dest,
+                int* read_bytes_count) {
+  if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
+  if (settings->length_modifier == NONE) *(int*)dest = *read_bytes_count;
+  if (settings->length_modifier == SHORT) *(short int*)dest = *read_bytes_count;
+  if (settings->length_modifier == LONG) *(long int*)dest = *read_bytes_count;
+  return true;
+}
+
 bool get_input(const char** str, current_format* settings, void* dest,
                int* read_bytes_count) {
   bool is_scan_succeded = false;
@@ -511,8 +522,8 @@ bool get_input(const char** str, current_format* settings, void* dest,
       is_scan_succeded = get_uhex(str, settings, dest, read_bytes_count);
     // if (settings->type_modifier == POINTER)
     //   is_scan_succeded = get_pointer(str, settings, dest, read_bytes_count);
-    // if (settings->type_modifier == NUMBER)
-    //   is_scan_succeded = get_number(str, settings, dest, read_bytes_count);
+    if (settings->type_modifier == NUMBER)
+      is_scan_succeded = get_number(str, settings, dest, read_bytes_count);
   }
   return is_scan_succeded;
 }

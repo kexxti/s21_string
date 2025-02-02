@@ -78,6 +78,8 @@ bool get_integer(const char** str, current_format* settings, void* dest,
                  int* read_bytes_count);
 bool get_string(const char** str, current_format* settings, void* dest,
                 int* read_bytes_count);
+bool get_number(const char** str, current_format* settings, void* dest,
+                int* read_bytes_count);
 bool get_input(const char** str, current_format* settings, void* dest,
                int* read_bytes_count);
 

@@ -1443,6 +1443,79 @@ START_TEST(test_s21_sscanf) {
   ck_assert_int_eq(res_s21, 1);
   ck_assert_str_eq(str_def, "dolor");
   ck_assert_str_eq(str_s21, "dolor");
+
+  // number
+  ch1_def = ch2_def = ch3_def = '\0';
+  ch1_s21 = ch2_s21 = ch3_s21 = '\0';
+  value_def = value_s21 = 0;
+  res_def = sscanf(" a   bc", " %c\n%c%n%c", &ch1_def, &ch2_def, &value_def,
+                   &ch3_def);
+  res_s21 = s21_sscanf(" a   bc", " %c\n%c%n%c", &ch1_s21, &ch2_s21, &value_s21,
+                       &ch3_s21);
+  ck_assert_int_eq(res_def, 3);
+  ck_assert_int_eq(res_s21, 3);
+  ck_assert_int_eq(ch1_def, 'a');
+  ck_assert_int_eq(ch2_def, 'b');
+  ck_assert_int_eq(ch3_def, 'c');
+  ck_assert_int_eq(value_def, 6);
+  ck_assert_int_eq(ch1_s21, 'a');
+  ck_assert_int_eq(ch2_s21, 'b');
+  ck_assert_int_eq(ch3_s21, 'c');
+  ck_assert_int_eq(value_s21, 6);
+
+  ch1_def = ch2_def = ch3_def = '\0';
+  ch1_s21 = ch2_s21 = ch3_s21 = '\0';
+  value_def = value_s21 = 0;
+  res_def = sscanf(" a   bc", "%n %c\n%c%c", &value_def, &ch1_def, &ch2_def,
+                   &ch3_def);
+  res_s21 = s21_sscanf(" a   bc", "%n %c\n%c%c", &value_s21, &ch1_s21, &ch2_s21,
+                       &ch3_s21);
+  ck_assert_int_eq(res_def, 3);
+  ck_assert_int_eq(res_s21, 3);
+  ck_assert_int_eq(ch1_def, 'a');
+  ck_assert_int_eq(ch2_def, 'b');
+  ck_assert_int_eq(ch3_def, 'c');
+  ck_assert_int_eq(value_def, 0);
+  ck_assert_int_eq(ch1_s21, 'a');
+  ck_assert_int_eq(ch2_s21, 'b');
+  ck_assert_int_eq(ch3_s21, 'c');
+  ck_assert_int_eq(value_s21, 0);
+
+  ch1_def = ch2_def = ch3_def = '\0';
+  ch1_s21 = ch2_s21 = ch3_s21 = '\0';
+  value_def = value_s21 = 0;
+  res_def = sscanf("  a   bc", " %n %c\n%c%c", &value_def, &ch1_def, &ch2_def,
+                   &ch3_def);
+  res_s21 = s21_sscanf("  a   bc", " %n %c\n%c%c", &value_s21, &ch1_s21,
+                       &ch2_s21, &ch3_s21);
+  ck_assert_int_eq(res_def, 3);
+  ck_assert_int_eq(res_s21, 3);
+  ck_assert_int_eq(ch1_def, 'a');
+  ck_assert_int_eq(ch2_def, 'b');
+  ck_assert_int_eq(ch3_def, 'c');
+  ck_assert_int_eq(value_def, 2);
+  ck_assert_int_eq(ch1_s21, 'a');
+  ck_assert_int_eq(ch2_s21, 'b');
+  ck_assert_int_eq(ch3_s21, 'c');
+  ck_assert_int_eq(value_s21, 2);
+
+  ch1_def = ch2_def = ch3_def = '\0';
+  ch1_s21 = ch2_s21 = ch3_s21 = '\0';
+  value_def = value_s21 = 0;
+  res_def =
+      sscanf("a      ", "%c%c%c%n", &ch1_def, &ch2_def, &ch3_def, &value_def);
+  res_s21 = s21_sscanf("a      ", "%c%c%c%n", &ch1_s21, &ch2_s21, &ch3_s21,
+                       &value_s21);
+  ck_assert_int_eq(res_def, 3);
+  ck_assert_int_eq(res_s21, 3);
+  ck_assert_int_eq(ch1_def, 'a');
+  ck_assert_int_eq(ch2_def, ' ');
+  ck_assert_int_eq(ch3_def, ' ');
+  ck_assert_int_eq(value_def, 3);
+  ck_assert_int_eq(ch1_s21, 'a');
+  ck_assert_int_eq(ch2_s21, ' ');
+  ck_assert_int_eq(ch3_s21, ' ');
+  ck_assert_int_eq(value_s21, 3);
 }
 END_TEST
 
