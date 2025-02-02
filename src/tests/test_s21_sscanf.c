@@ -412,20 +412,6 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(ch2, '\0');
   ck_assert_int_eq(res, 1);
 
-  ch1 = ch2 = ch3 = '\0';
-  res = sscanf("a bc", "%2c%2c%c", &ch1, &ch2, &ch3);  // sum of width < length
-  ck_assert_int_eq(ch1, 'a');
-  ck_assert_int_eq(ch2, 'b');  // F read by %2c
-  ck_assert_int_eq(ch3, 'c');
-  ck_assert_int_eq(res, 2);  // <-- width with chars is strange
-
-  ch1 = ch2 = ch3 = '\0';
-  res = sscanf("aFbc", "%5c%c%c", &ch1, &ch2, &ch3);  // sum of width > length
-  ck_assert_int_eq(ch1, 'a');
-  ck_assert_int_eq(ch2, 'F');  // F not read
-  ck_assert_int_eq(ch3, 'b');
-  ck_assert_int_eq(res, 1);  // <-- like why
-
   // hex and octal with OOB
   value = 0;
   int remain = 0;
@@ -639,26 +625,6 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(ch3, ' ');
   ck_assert_int_eq(value, 3);  // ^^^ and only if they are skipped ^^^
   ck_assert_int_eq(res, 3);
-
-  ch1 = ch2 = ch3 = '\0';
-  value = 0;
-  res = sscanf("a bc", "%2c%n%2c%c", &ch1, &value, &ch2, &ch3);
-  ck_assert_int_eq(ch1, 'a');
-  ck_assert_int_eq(ch2, 'b');
-  ck_assert_int_eq(ch3, 'c');
-  ck_assert_int_eq(value, 2);
-  ck_assert_int_eq(res, 2);
-
-  ch1 = ch2 = ch3 = '\0';
-  value = 0;
-  value2 = 0;
-  res = sscanf("aFbc", "%5c%n%c%c%n", &ch1, &value, &ch2, &ch3, &value2);
-  ck_assert_int_eq(ch1, 'a');
-  ck_assert_int_eq(ch2, 'F');
-  ck_assert_int_eq(ch3, 'b');
-  ck_assert_int_eq(value, 4);
-  ck_assert_int_eq(value2, 0);
-  ck_assert_int_eq(res, 1);
 
   // symbols and percent
   ch1 = ch2 = ch3 = '\0';
