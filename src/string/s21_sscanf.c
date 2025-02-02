@@ -13,9 +13,16 @@ int s21_sscanf(const char* str, const char* format, ...) {
     read_format(&format, settings);
     normalize_format(settings);
     void* dest = NULL;
-    if (needs_dest(settings)) dest = get_next_dest(settings, args);
+    void** pointer_dest = NULL;
+    if (needs_dest(settings)) {
+      if (settings->type_modifier == POINTER)
+        pointer_dest = va_arg(args, void**);
+      else
+        dest = get_next_dest(settings, args);
+    }
     const char* temp = str;  // to track EOF
-    is_scan_failed = !get_input(&str, settings, dest, &read_bytes_count);
+    is_scan_failed =
+        !get_input(&str, settings, dest, pointer_dest, &read_bytes_count);
     if (!is_scan_failed && !settings->is_symbol && !settings->ignore &&
         settings->type_modifier != NUMBER)
       successful_scans_count++;
@@ -163,9 +170,6 @@ void* get_next_dest(current_format* settings, va_list args) {
         dest = va_arg(args, unsigned short int*);
       else if (settings->length_modifier == LONG)
         dest = va_arg(args, unsigned long int*);
-      break;
-    case POINTER:
-      dest = va_arg(args, void*);
       break;
     case FLOAT:
       if (settings->length_modifier == NONE)
@@ -498,8 +502,34 @@ bool get_number(const char** str, current_format* settings, void* dest,
   return true;
 }
 
+bool get_pointer(const char** str, current_format* settings, void** dest,
+                 int* read_bytes_count) {
+  bool is_scan_succeded = false;
+  if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
+  bool negative = is_negative_ato(str, read_bytes_count);
+  bool has_prefix = false;
+  if (**str == '0') {
+    has_prefix = true;
+    (*str)++;
+    (*read_bytes_count)++;
+  }
+  if (**str == 'x' || **str == 'X') {
+    (*str)++;
+    (*read_bytes_count)++;
+  }
+  unsigned long int value = s21_a_to_hexl(
+      str, read_bytes_count, &is_scan_succeded);  // it's always hex
+  if (is_scan_succeded && !settings->ignore) {
+    if (negative) value *= -1;
+    *dest = (void*)value;
+  } else if (has_prefix && !settings->ignore)
+    *dest = (void*)0;
+  if (has_prefix) is_scan_succeded = true;
+  return is_scan_succeded;
+}
+
 bool get_input(const char** str, current_format* settings, void* dest,
-               int* read_bytes_count) {
+               void** pointer_dest, int* read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->is_symbol)
     is_scan_succeded = get_symbol(str, settings, read_bytes_count);
@@ -511,7 +541,7 @@ bool get_input(const char** str, current_format* settings, void* dest,
     if (settings->type_modifier == INTEGER)
       is_scan_succeded = get_integer(str, settings, dest, read_bytes_count);
     // if (settings->type_modifier == FLOAT)
-    //   is_scan_succeded = get_float(str, settings, dest, read_bytes_count);
+    //   is_scan_succeded = get_float(str, settings, *dest, read_bytes_count);
     if (settings->type_modifier == UOCTAL)
       is_scan_succeded = get_uoctal(str, settings, dest, read_bytes_count);
     if (settings->type_modifier == STRING)
@@ -520,8 +550,10 @@ bool get_input(const char** str, current_format* settings, void* dest,
       is_scan_succeded = get_udecimal(str, settings, dest, read_bytes_count);
     if (settings->type_modifier == UHEX)
       is_scan_succeded = get_uhex(str, settings, dest, read_bytes_count);
-    // if (settings->type_modifier == POINTER)
-    //   is_scan_succeded = get_pointer(str, settings, dest, read_bytes_count);
+    if (settings->type_modifier == POINTER) {
+      is_scan_succeded =
+          get_pointer(str, settings, pointer_dest, read_bytes_count);
+    }
     if (settings->type_modifier == NUMBER)
       is_scan_succeded = get_number(str, settings, dest, read_bytes_count);
   }

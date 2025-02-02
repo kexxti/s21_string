@@ -1516,6 +1516,73 @@ START_TEST(test_s21_sscanf) {
   ck_assert_int_eq(ch2_s21, ' ');
   ck_assert_int_eq(ch3_s21, ' ');
   ck_assert_int_eq(value_s21, 3);
+
+  // pointers
+  void *pp1_def, *pp2_def;
+  void *pp1_s21, *pp2_s21;
+  pp2_def = pp2_s21 = (void *)0x80af1465;
+  res_def = sscanf("0x80af1465", "%p", &pp1_def);
+  res_s21 = s21_sscanf("0x80af1465", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
+
+  pp2_def = pp2_s21 = NULL;
+  res_def = sscanf("0", "%p", &pp1_def);
+  res_s21 = s21_sscanf("0", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
+
+  pp2_def = pp2_s21 = (void *)0xFFFFFFFF;
+  res_def = sscanf("0xFFFFFFFF", "%p", &pp1_def);
+  res_s21 = s21_sscanf("0xFFFFFFFF", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
+
+  pp2_def = pp2_s21 = (void *)1;
+  res_def = sscanf("-0x1", "%p", &pp1_def);
+  res_s21 = s21_sscanf("-0x1", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_ne(pp1_def, pp2_def);
+
+  pp2_def = pp2_s21 = (void *)0xFFFFFFFFFFFFFFFF;
+  res_def = sscanf("0xFFFFFFFFFFFFFFFF", "%p", &pp1_def);
+  res_s21 = s21_sscanf("0xFFFFFFFFFFFFFFFF", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
+
+  pp2_def = pp2_s21 = (void *)7;
+  res_def = sscanf("NULL", "%p", &pp1_def);
+  res_s21 = s21_sscanf("NULL", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 0);
+  ck_assert_int_eq(res_s21, 0);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_ne(pp1_def, pp2_def);
+
+  pp2_def = pp2_s21 = (void *)0x71234645;
+  res_def = sscanf("071234645", "%p", &pp1_def);
+  res_s21 = s21_sscanf("071234645", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
+
+  pp2_def = pp2_s21 = (void *)0x8954;
+  res_def = sscanf("8954", "%p", &pp1_def);
+  res_s21 = s21_sscanf("8954", "%p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
 }
 END_TEST
 
