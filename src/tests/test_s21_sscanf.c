@@ -663,91 +663,6 @@ START_TEST(test_default_sscanf) {
 }
 END_TEST
 
-START_TEST(test_custom_atoi) {
-  char str[100];
-  char *str2;
-  strcpy(str, "123");
-  str2 = strdup(str);
-  char *temp = str2;
-  int value = s21_atoi((const char **)&str2, NULL, NULL);
-  int value2 = atoi(str);
-  ck_assert_int_eq(value, 123);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "-123");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, -123);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "00123");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, 123);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "-00123");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, -123);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "2147483647");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, INT32_MAX);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "-2147483648");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, INT32_MIN);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "-2147483649");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, INT32_MAX);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "2147483648");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, INT32_MIN);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-
-  strcpy(str, "781235671236758");
-  str2 = strdup(str);
-  temp = str2;
-  value = s21_atoi((const char **)&str2, NULL, NULL);
-  value2 = atoi(str);
-  ck_assert_int_eq(value, value2);
-  free(temp);
-}
-END_TEST
-
 START_TEST(test_s21_sscanf) {
   int value_def = 0;
   int res_def = sscanf("123", "%d", &value_def);
@@ -1583,6 +1498,59 @@ START_TEST(test_s21_sscanf) {
   ck_assert_int_eq(res_s21, 1);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
+
+  // width
+  value_def = value_s21 = 0;
+  res_def = sscanf("123456789", "%5d", &value_def);
+  res_s21 = s21_sscanf("123456789", "%5d", &value_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(value_def, value_s21);
+
+  value_def = value_s21 = 0;
+  res_def = sscanf("0x12fa456789", "%5x", &value_def);
+  res_s21 = s21_sscanf("0x12fa456789", "%5x", &value_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(value_def, value_s21);
+
+  value_def = value_s21 = 0;
+  res_def = sscanf("012fa456789", "%5o", &value_def);
+  res_s21 = s21_sscanf("012fa456789", "%5o", &value_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(value_def, value_s21);
+
+  value_def = value_s21 = 0;
+  res_def = sscanf("0x", "%5i", &value_def);
+  res_s21 = s21_sscanf("0x", "%5i", &value_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(value_def, value_s21);
+
+  value_def = value_s21 = 7;
+  res_def = sscanf("0x1235", "%1x", &value_def);
+  res_s21 = s21_sscanf("0x1235", "%1x", &value_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(value_def, value_s21);
+
+  value_def = value_s21 = 7;
+  num_def = num_s21 = 0;
+  res_def = sscanf("0x1235", "%1x%n", &value_def, &num_def);
+  res_s21 = s21_sscanf("0x1235", "%1x%n", &value_s21, &num_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(value_def, value_s21);
+  ck_assert_int_eq(num_def, num_s21);
+
+  pp2_def = pp2_s21 = (void *)0x89;
+  res_def = sscanf("8954", "%2p", &pp1_def);
+  res_s21 = s21_sscanf("8954", "%2p", &pp1_s21);
+  ck_assert_int_eq(res_def, 1);
+  ck_assert_int_eq(res_s21, 1);
+  ck_assert_ptr_eq(pp1_def, pp1_s21);
+  ck_assert_ptr_eq(pp1_def, pp2_def);
 }
 END_TEST
 
@@ -1592,7 +1560,6 @@ Suite *s21_sscanf_suite(void) {
   tcase_add_test(tc_inner, test_sscanf_get_length);
   tcase_add_test(tc_inner, test_sscanf_get_modifier);
   tcase_add_test(tc_inner, test_sscanf_get_width);
-  tcase_add_test(tc_inner, test_custom_atoi);
   suite_add_tcase(s, tc_inner);
 
   TCase *tc_formats = tcase_create("Format filling");

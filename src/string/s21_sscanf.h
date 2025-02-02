@@ -48,30 +48,35 @@ bool get_symbol(const char** str, current_format* settings,
 bool get_char(const char** str, current_format* settings, void* dest,
               int* read_bytes_count);
 bool is_negative_ato(const char** str, int* read_bytes_count);
-int s21_atoi(const char** str, int* read_bytes_count, bool* is_scan_succeded);
-short int s21_atosi(const char** str, int* read_bytes_count,
-                    bool* is_scan_succeded);
-long int s21_atol(const char** str, int* read_bytes_count,
-                  bool* is_scan_succeded);
+void atoi_move_to_next(s21_size_t* length, const char** str,
+                       int* read_bytes_count, bool* is_scan_succeded);
+int s21_atoi(const char** str, current_format* settings, int* read_bytes_count,
+             bool* is_scan_succeded);
+short int s21_atosi(const char** str, current_format* settings,
+                    int* read_bytes_count, bool* is_scan_succeded);
+long int s21_atol(const char** str, current_format* settings,
+                  int* read_bytes_count, bool* is_scan_succeded);
 bool get_decimal(const char** str, current_format* settings, void* dest,
                  int* read_bytes_count);
 void skip_whitespaces(const char** str, int* read_bytes_count);
 bool get_udecimal(const char** str, current_format* settings, void* dest,
                   int* read_bytes_count);
-int s21_a_to_octali(const char** str, int* read_bytes_count,
-                    bool* is_scan_succeded);
-short int s21_a_to_octalsi(const char** str, int* read_bytes_count,
-                           bool* is_scan_succeded);
-long int s21_a_to_octall(const char** str, int* read_bytes_count,
-                         bool* is_scan_succeded);
+int s21_a_to_octali(const char** str, current_format* settings,
+                    int* read_bytes_count, bool* is_scan_succeded);
+short int s21_a_to_octalsi(const char** str, current_format* settings,
+                           int* read_bytes_count, bool* is_scan_succeded);
+long int s21_a_to_octall(const char** str, current_format* settings,
+                         int* read_bytes_count, bool* is_scan_succeded);
 bool get_uoctal(const char** str, current_format* settings, void* dest,
                 int* read_bytes_count);
-int s21_a_to_hexi(const char** str, int* read_bytes_count,
-                  bool* is_scan_succeded);
-short int s21_a_to_hexsi(const char** str, int* read_bytes_count,
-                         bool* is_scan_succeded);
-long int s21_a_to_hexl(const char** str, int* read_bytes_count,
-                       bool* is_scan_succeded);
+void skip_hex_prefix(s21_size_t* length, const char** str,
+                     current_format* settings, int* read_bytes_count);
+int s21_a_to_hexi(const char** str, current_format* settings,
+                  int* read_bytes_count, bool* is_scan_succeded);
+short int s21_a_to_hexsi(const char** str, current_format* settings,
+                         int* read_bytes_count, bool* is_scan_succeded);
+long int s21_a_to_hexl(const char** str, current_format* settings,
+                       int* read_bytes_count, bool* is_scan_succeded);
 bool get_uhex(const char** str, current_format* settings, void* dest,
               int* read_bytes_count);
 bool get_integer(const char** str, current_format* settings, void* dest,
