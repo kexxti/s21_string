@@ -6,6 +6,7 @@
 #include "test_s21_memchr.h"
 #include "test_s21_memcmp.h"
 #include "test_s21_memcpy.h"
+#include "test_s21_memset.h"
 #include "test_s21_sscanf.h"
 #include "test_s21_strchr.h"
 #include "test_s21_strcspn.h"
@@ -28,6 +29,7 @@ int main() {
   srunner_add_suite(sr, s21_memchr_suite());
   srunner_add_suite(sr, s21_memcmp_suite());
   srunner_add_suite(sr, s21_memcpy_suite());
+  srunner_add_suite(sr, s21_memset_suite());
   srunner_add_suite(sr, s21_sscanf_suite());
 
   srunner_run_all(sr, CK_NORMAL);
