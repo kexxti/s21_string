@@ -1,6 +1,5 @@
 #include "test_s21_sscanf.h"
 
-#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -528,7 +527,8 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(res, 1);
   ck_assert_double_ne(dval, fval);
 
-  // ext float
+// ext float
+#ifndef VALGRIND
   if (sizeof(double) != sizeof(long double)) {
     long double ldval = 1;
     dval = 1;
@@ -540,6 +540,8 @@ START_TEST(test_default_sscanf) {
     ck_assert_int_eq(res, 1);
     ck_assert_ldouble_ne(ldval, dval);
   }
+#endif
+
   // extra
   fval = 1;
   res = sscanf(".02.3", "%*f%f", &fval);
@@ -1626,14 +1628,6 @@ START_TEST(test_s21_sscanf) {
   fval_def = fval_s21 = 0;
   res_def = sscanf("-1E-5", "%f", &fval_def);
   res_s21 = s21_sscanf("-1E-5", "%f", &fval_s21);
-  // union float_u {
-  //   float f;
-  //   uint32_t u;
-  // };
-  // union float_u def = {.f = fval_def};
-  // union float_u s21 = {.f = fval_s21};
-  // printf("def: %f\n   : 0x%" PRIx32 "\n", fval_def, def.u);
-  // printf("s21: %f\n   : 0x%" PRIx32 "\n", fval_s21, s21.u);
   ck_assert_int_eq(res_def, res_s21);
   ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
 
@@ -1692,14 +1686,6 @@ START_TEST(test_s21_sscanf) {
   dval_def = dval_s21 = 1;
   res_def = sscanf("1.2E128", "%lf", &dval_def);
   res_s21 = s21_sscanf("1.2E128", "%lf", &dval_s21);
-  // union double_u {
-  //   double f;
-  //   uint64_t u;
-  // };
-  // union double_u ddef = {.f = dval_def};
-  // union double_u fs21 = {.f = dval_s21};
-  // printf("def: %lf\n   : 0x%" PRIx64 "\n", fval_def, ddef.u);
-  // printf("s21: %lf\n   : 0x%" PRIx64 "\n", fval_s21, fs21.u);
   ck_assert_int_eq(res_def, res_s21);
   ck_assert_double_eq_tol(dval_def, dval_s21, 1E122);
 
@@ -1723,7 +1709,8 @@ START_TEST(test_s21_sscanf) {
   ck_assert_double_ne(dval_def, fval_def);
   ck_assert_double_ne(dval_s21, fval_s21);
 
-  // ext float
+// ext float
+#ifndef VALGRIND
   if (sizeof(double) != sizeof(long double)) {
     long double ldval_def, ldval_s21;
     ldval_def = ldval_s21 = 1;
@@ -1740,6 +1727,7 @@ START_TEST(test_s21_sscanf) {
     ck_assert_ldouble_ne(ldval_def, dval_def);
     ck_assert_ldouble_ne(ldval_s21, dval_s21);
   }
+#endif
 
   // floats with width
   fval_def = fval_s21 = 1;
