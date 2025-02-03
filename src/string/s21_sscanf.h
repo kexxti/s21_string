@@ -2,6 +2,7 @@
 #define S21_SSCANF_H
 
 #include <ctype.h>
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -47,7 +48,8 @@ bool get_symbol(const char** str, current_format* settings,
                 int* read_bytes_count);
 bool get_char(const char** str, current_format* settings, void* dest,
               int* read_bytes_count);
-bool is_negative_ato(const char** str, int* read_bytes_count);
+bool is_negative_ato(s21_size_t* length, const char** str,
+                     int* read_bytes_count);
 void atoi_move_to_next(s21_size_t* length, const char** str,
                        int* read_bytes_count, bool* is_scan_succeded);
 int s21_atoi(const char** str, current_format* settings, int* read_bytes_count,
@@ -89,6 +91,13 @@ bool get_number(const char** str, current_format* settings, void* dest,
                 int* read_bytes_count);
 bool get_pointer(const char** str, current_format* settings, void** dest,
                  int* read_bytes_count);
+bool get_float(const char** str, current_format* settings, void* dest,
+               int* read_bytes_count);
+long double read_extended_double(const char** str, current_format* settings,
+                                 int* read_bytes_count, bool* is_scan_succeded);
+
+void goto_next_char(s21_size_t* length, const char** str,
+                    int* read_bytes_count);
 bool get_input(const char** str, current_format* settings, void* dest,
                void** pointer_dest, int* read_bytes_count);
 

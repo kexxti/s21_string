@@ -1,5 +1,6 @@
 #include "test_s21_sscanf.h"
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -668,48 +669,42 @@ START_TEST(test_s21_sscanf) {
   int res_def = sscanf("123", "%d", &value_def);
   int value_s21 = 0;
   int res_s21 = s21_sscanf("123", "%d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 123);
   ck_assert_int_eq(value_s21, 123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("123", " %d", &value_def);
   res_s21 = s21_sscanf("123", " %d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 123);
   ck_assert_int_eq(value_s21, 123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    123", "  %d", &value_def);
   res_s21 = s21_sscanf("    123", "  %d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 123);
   ck_assert_int_eq(value_s21, 123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    123", "\n%d", &value_def);
   res_s21 = s21_sscanf("    123", "\n%d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 123);
   ck_assert_int_eq(value_s21, 123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-123", "\n %d", &value_def);
   res_s21 = s21_sscanf("-123", "\n %d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -123);
   ck_assert_int_eq(value_s21, -123);
 
   value_def = value_s21 = 8;
   res_def = sscanf("-", "%d", &value_def);
   res_s21 = s21_sscanf("-", "%d", &value_s21);
-  ck_assert_int_eq(res_def, 0);
-  ck_assert_int_eq(res_s21, 0);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 8);
   ck_assert_int_eq(value_s21, 8);
 
@@ -717,8 +712,7 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 1;
   res_def = sscanf("h", "%d", &value_def);
   res_s21 = s21_sscanf("h", "%d", &value_s21);
-  ck_assert_int_eq(res_def, 0);
-  ck_assert_int_eq(res_s21, 0);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 1);
   ck_assert_int_eq(value_s21, 1);
 
@@ -726,32 +720,28 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("-2147483648", "%d", &value_def);
   res_s21 = s21_sscanf("-2147483648", "%d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, INT32_MIN);
   ck_assert_int_eq(value_s21, INT32_MIN);
 
   value_def = value_s21 = 0;
   res_def = sscanf("2147483647", "%d", &value_def);
   res_s21 = s21_sscanf("2147483647", "%d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, INT32_MAX);
   ck_assert_int_eq(value_s21, INT32_MAX);
 
   value_def = value_s21 = 0;
   res_def = sscanf("2147483648", "%d", &value_def);
   res_s21 = s21_sscanf("2147483648", "%d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, INT32_MIN);
   ck_assert_int_eq(value_s21, INT32_MIN);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-2147483649", "%d", &value_def);
   res_s21 = s21_sscanf("-2147483649", "%d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, INT32_MAX);
   ck_assert_int_eq(value_s21, INT32_MAX);
 
@@ -801,8 +791,7 @@ START_TEST(test_s21_sscanf) {
   ch1_s21 = ch2_s21 = '\0';
   res_def = sscanf("a", "%c%c", &ch1_def, &ch2_def);  // NULL_TERMINATOR
   res_s21 = s21_sscanf("a", "%c%c", &ch1_s21, &ch2_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(ch1_def, 'a');
   ck_assert_int_eq(ch2_def, '\0');
   ck_assert_int_eq(ch1_s21, 'a');
@@ -812,8 +801,7 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("some    words1234", "some\nwords%d", &value_def);
   res_s21 = s21_sscanf("some    words1234", "some\nwords%d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 1234);
   ck_assert_int_eq(value_s21, 1234);
 
@@ -821,16 +809,14 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("2147483648", "%u", &value_def);
   res_s21 = s21_sscanf("2147483648", "%u", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -2147483648);
   ck_assert_int_eq(value_s21, -2147483648);
 
   value_def = value_s21 = 1;
   res_def = sscanf("-10", "%u", &value_def);
   res_s21 = s21_sscanf("-10", "%u", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -10);
   ck_assert_int_eq(value_s21, -10);
 
@@ -838,8 +824,7 @@ START_TEST(test_s21_sscanf) {
   uint32_t uval_s21 = 1;
   res_def = sscanf("-10", "%u", &uval_def);
   res_s21 = s21_sscanf("-10", "%u", &uval_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_uint_eq(uval_def, 4294967286);
   ck_assert_uint_eq(uval_s21, 4294967286);
   ck_assert_int_eq(uval_def, 4294967286);
@@ -852,8 +837,7 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("   945462634324254", "\t%u", &value_def);
   res_s21 = s21_sscanf("   945462634324254", "\t%u", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, (int)945462634324254);
   ck_assert_int_eq(value_s21, (int)945462634324254);
 
@@ -862,24 +846,21 @@ START_TEST(test_s21_sscanf) {
   ushort_value_def = ushort_value_s21 = 0;
   res_def = sscanf("1234", "%hu", &ushort_value_def);
   res_s21 = s21_sscanf("1234", "%hu", &ushort_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(ushort_value_def, 1234);
   ck_assert_int_eq(ushort_value_s21, 1234);
 
   ushort_value_def = ushort_value_s21 = 0;
   res_def = sscanf("    65535", "  %hu", &ushort_value_def);
   res_s21 = s21_sscanf("    65535", "  %hu", &ushort_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_uint_eq(ushort_value_def, 65535);
   ck_assert_uint_eq(ushort_value_s21, 65535);
 
   ushort_value_def = ushort_value_s21 = 0;
   res_def = sscanf("891235891235879", "%hu", &ushort_value_def);
   res_s21 = s21_sscanf("891235891235879", "%hu", &ushort_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_uint_eq(ushort_value_def, (unsigned short int)891235891235879);
   ck_assert_uint_eq(ushort_value_s21, (unsigned short int)891235891235879);
 
@@ -888,24 +869,21 @@ START_TEST(test_s21_sscanf) {
   ulong_value_def = ulong_value_s21 = 0;
   res_def = sscanf("1234", "%lu", &ulong_value_def);
   res_s21 = s21_sscanf("1234", "%lu", &ulong_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(ulong_value_def, 1234);
   ck_assert_int_eq(ulong_value_s21, 1234);
 
   ulong_value_def = ulong_value_s21 = 0;
   res_def = sscanf("    4294967295", "  %lu", &ulong_value_def);
   res_s21 = s21_sscanf("    4294967295", "  %lu", &ulong_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_uint_eq(ulong_value_def, 4294967295);
   ck_assert_uint_eq(ulong_value_s21, 4294967295);
 
   ulong_value_def = ulong_value_s21 = 0;
   res_def = sscanf("891235891235879", "%lu", &ulong_value_def);
   res_s21 = s21_sscanf("891235891235879", "%lu", &ulong_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_uint_eq(ulong_value_def, 891235891235879);
   ck_assert_uint_eq(ulong_value_s21, 891235891235879);
 
@@ -913,32 +891,28 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("0123", " %o", &value_def);
   res_s21 = s21_sscanf("0123", " %o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0123);
   ck_assert_int_eq(value_s21, 0123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    0123", "  %o", &value_def);
   res_s21 = s21_sscanf("    0123", "  %o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0123);
   ck_assert_int_eq(value_s21, 0123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    0123", "\n%o", &value_def);
   res_s21 = s21_sscanf("    0123", "\n%o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0123);
   ck_assert_int_eq(value_s21, 0123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-0123", "\n %o", &value_def);
   res_s21 = s21_sscanf("-0123", "\n %o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -0123);
   ck_assert_int_eq(value_s21, -0123);
 
@@ -946,32 +920,28 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("123", " %o", &value_def);
   res_s21 = s21_sscanf("123", " %o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0123);
   ck_assert_int_eq(value_s21, 0123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    123", "  %o", &value_def);
   res_s21 = s21_sscanf("    123", "  %o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0123);
   ck_assert_int_eq(value_s21, 0123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    123", "\n%o", &value_def);
   res_s21 = s21_sscanf("    123", "\n%o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0123);
   ck_assert_int_eq(value_s21, 0123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-123", "\n %o", &value_def);
   res_s21 = s21_sscanf("-123", "\n %o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -0123);
   ck_assert_int_eq(value_s21, -0123);
 
@@ -1004,32 +974,28 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("0x12fa3", " %x", &value_def);
   res_s21 = s21_sscanf("0x12fa3", " %x", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x12fa3);
   ck_assert_int_eq(value_s21, 0x12fa3);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    0x12fa3", "  %X", &value_def);
   res_s21 = s21_sscanf("    0x12fa3", "  %X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x12fa3);
   ck_assert_int_eq(value_s21, 0x12fa3);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    0x12fa3", "\n%X", &value_def);
   res_s21 = s21_sscanf("    0x12fa3", "\n%X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x12fa3);
   ck_assert_int_eq(value_s21, 0x12fa3);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-0x12fa3", "\n %X", &value_def);
   res_s21 = s21_sscanf("-0x12fa3", "\n %X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -0x12fa3);
   ck_assert_int_eq(value_s21, -0x12fa3);
 
@@ -1038,39 +1004,34 @@ START_TEST(test_s21_sscanf) {
   res_s21 = s21_sscanf("x12fa3", " %X", &value_s21);
   ck_assert_int_eq(value_def, 1);
   ck_assert_int_eq(value_s21, 1);
-  ck_assert_int_eq(res_def, 0);
-  ck_assert_int_eq(res_s21, 0);
+  ck_assert_int_eq(res_def, res_s21);
 
   // hex without prefix
   value_def = value_s21 = 0;
   res_def = sscanf("12fa3", " %X", &value_def);
   res_s21 = s21_sscanf("12fa3", " %X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x12fa3);
   ck_assert_int_eq(value_s21, 0x12fa3);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    12fa3", "  %X", &value_def);
   res_s21 = s21_sscanf("    12fa3", "  %X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x12fa3);
   ck_assert_int_eq(value_s21, 0x12fa3);
 
   value_def = value_s21 = 0;
   res_def = sscanf("    12fa3", "\n%X", &value_def);
   res_s21 = s21_sscanf("    12fa3", "\n%X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x12fa3);
   ck_assert_int_eq(value_s21, 0x12fa3);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-12fa3", "\n %X", &value_def);
   res_s21 = s21_sscanf("-12fa3", "\n %X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -0x12fa3);
   ck_assert_int_eq(value_s21, -0x12fa3);
 
@@ -1078,16 +1039,14 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 1;
   res_def = sscanf("0", "\n %o", &value_def);
   res_s21 = s21_sscanf("0", "\n %o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0);
   ck_assert_int_eq(value_s21, 0);
 
   value_def = value_s21 = 1;
   res_def = sscanf("0x", "\n %X", &value_def);
   res_s21 = s21_sscanf("0x", "\n %X", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x0);
   ck_assert_int_eq(value_s21, 0x0);
 
@@ -1095,48 +1054,42 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("123", " %i", &value_def);
   res_s21 = s21_sscanf("123", " %i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 123);
   ck_assert_int_eq(value_s21, 123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-123", " %i", &value_def);
   res_s21 = s21_sscanf("-123", " %i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, -123);
   ck_assert_int_eq(value_s21, -123);
 
   value_def = value_s21 = 0;
   res_def = sscanf("054", "%i", &value_def);
   res_s21 = s21_sscanf("054", "%i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 054);
   ck_assert_int_eq(value_s21, 054);
 
   value_def = value_s21 = 0;
   res_def = sscanf("0xFF", "%i", &value_def);
   res_s21 = s21_sscanf("0xFF", "%i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0xFF);
   ck_assert_int_eq(value_s21, 0xFF);
 
   value_def = value_s21 = 1;
   res_def = sscanf("0x", "%i", &value_def);
   res_s21 = s21_sscanf("0x", "%i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0x0);
   ck_assert_int_eq(value_s21, 0x0);
 
   value_def = value_s21 = 1;
   res_def = sscanf("0", "%i", &value_def);
   res_s21 = s21_sscanf("0", "%i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, 0);
   ck_assert_int_eq(value_s21, 0);
 
@@ -1157,56 +1110,49 @@ START_TEST(test_s21_sscanf) {
   short_value_def = short_value_s21 = 0;
   res_def = sscanf("123", " %hi", &short_value_def);
   res_s21 = s21_sscanf("123", " %hi", &short_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(short_value_def, 123);
   ck_assert_int_eq(short_value_s21, 123);
 
   short_value_def = short_value_s21 = 0;
   res_def = sscanf("-123", " %hi", &short_value_def);
   res_s21 = s21_sscanf("-123", " %hi", &short_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(short_value_def, -123);
   ck_assert_int_eq(short_value_s21, -123);
 
   short_value_def = short_value_s21 = 0;
   res_def = sscanf("054", "%hi", &short_value_def);
   res_s21 = s21_sscanf("054", "%hi", &short_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(short_value_def, 054);
   ck_assert_int_eq(short_value_s21, 054);
 
   short_value_def = short_value_s21 = 0;
   res_def = sscanf("0xFF", "%hi", &short_value_def);
   res_s21 = s21_sscanf("0xFF", "%hi", &short_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(short_value_def, 0xFF);
   ck_assert_int_eq(short_value_s21, 0xFF);
 
   short_value_def = short_value_s21 = 0;
   res_def = sscanf("0x4F12F", "%hi", &short_value_def);
   res_s21 = s21_sscanf("0x4F12F", "%hi", &short_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(short_value_def, (short int)0x4F12F);
   ck_assert_int_eq(short_value_s21, (short int)0x4F12F);
 
   short_value_def = short_value_s21 = 1;
   res_def = sscanf("0x", "%hi", &short_value_def);
   res_s21 = s21_sscanf("0x", "%hi", &short_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(short_value_def, 0x0);
   ck_assert_int_eq(short_value_s21, 0x0);
 
   short_value_def = short_value_s21 = 1;
   res_def = sscanf("0", "%hi", &short_value_def);
   res_s21 = s21_sscanf("0", "%hi", &short_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(short_value_def, 0);
   ck_assert_int_eq(short_value_s21, 0);
 
@@ -1215,56 +1161,49 @@ START_TEST(test_s21_sscanf) {
   long_value_def = long_value_s21 = 0;
   res_def = sscanf("123", " %li", &long_value_def);
   res_s21 = s21_sscanf("123", " %li", &long_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(long_value_def, 123);
   ck_assert_int_eq(long_value_s21, 123);
 
   long_value_def = long_value_s21 = 0;
   res_def = sscanf("-123", " %li", &long_value_def);
   res_s21 = s21_sscanf("-123", " %li", &long_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(long_value_def, -123);
   ck_assert_int_eq(long_value_s21, -123);
 
   long_value_def = long_value_s21 = 0;
   res_def = sscanf("054", "%li", &long_value_def);
   res_s21 = s21_sscanf("054", "%li", &long_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(long_value_def, 054);
   ck_assert_int_eq(long_value_s21, 054);
 
   long_value_def = long_value_s21 = 0;
   res_def = sscanf("0xFF", "%li", &long_value_def);
   res_s21 = s21_sscanf("0xFF", "%li", &long_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(long_value_def, 0xFF);
   ck_assert_int_eq(long_value_s21, 0xFF);
 
   long_value_def = long_value_s21 = 0;
   res_def = sscanf("0x4F12F", "%li", &long_value_def);
   res_s21 = s21_sscanf("0x4F12F", "%li", &long_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(long_value_def, 0x4F12F);
   ck_assert_int_eq(long_value_s21, 0x4F12F);
 
   long_value_def = long_value_s21 = 1;
   res_def = sscanf("0x", "%li", &long_value_def);
   res_s21 = s21_sscanf("0x", "%li", &long_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(long_value_def, 0x0);
   ck_assert_int_eq(long_value_s21, 0x0);
 
   long_value_def = long_value_s21 = 1;
   res_def = sscanf("0", "%li", &long_value_def);
   res_s21 = s21_sscanf("0", "%li", &long_value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(long_value_def, 0);
   ck_assert_int_eq(long_value_s21, 0);
 
@@ -1274,32 +1213,28 @@ START_TEST(test_s21_sscanf) {
   const char *text = "Lorem \n  ipsum dolor sit amet";
   res_def = sscanf(text, "%s", str_def);
   res_s21 = s21_sscanf(text, "%s", str_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_str_eq(str_def, "Lorem");
   ck_assert_str_eq(str_s21, "Lorem");
 
   str_def[0] = str_s21[0] = '\0';
   res_def = sscanf(text, "%20s", str_def);
   res_s21 = s21_sscanf(text, "%20s", str_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_str_eq(str_def, "Lorem");
   ck_assert_str_eq(str_s21, "Lorem");
 
   str_def[0] = str_s21[0] = '\0';
   res_def = sscanf(text, "%3s", str_def);
   res_s21 = s21_sscanf(text, "%3s", str_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_str_eq(str_def, "Lor");
   ck_assert_str_eq(str_s21, "Lor");
 
   str_def[0] = str_s21[0] = '\0';
   res_def = sscanf("Lorem", "%s%s", str_def, str_def);
   res_s21 = s21_sscanf("Lorem", "%s%s", str_s21, str_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_str_eq(str_def, "Lorem");
   ck_assert_str_eq(str_s21, "Lorem");
 
@@ -1335,14 +1270,12 @@ START_TEST(test_s21_sscanf) {
 
   res_def = sscanf("1234 5678 9123", "%*d%*d%*d");
   res_s21 = s21_sscanf("1234 5678 9123", "%*d%*d%*d");
-  ck_assert_int_eq(res_def, 0);
-  ck_assert_int_eq(res_s21, 0);
+  ck_assert_int_eq(res_def, res_s21);
 
   str_def[0] = str_s21[0] = '\0';
   res_def = sscanf(text, "%*s%s", str_def);
   res_s21 = s21_sscanf(text, "%*s%s", str_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_str_eq(str_def, "ipsum");
   ck_assert_str_eq(str_s21, "ipsum");
 
@@ -1354,8 +1287,7 @@ START_TEST(test_s21_sscanf) {
       sscanf("Lorem \n\t  ipsum% dolor sit amet", "%*s\tipsum%%%s", str_def);
   res_s21 = s21_sscanf("Lorem \n\t  ipsum% dolor sit amet", "%*s\tipsum%%%s",
                        str_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_str_eq(str_def, "dolor");
   ck_assert_str_eq(str_s21, "dolor");
 
@@ -1438,64 +1370,56 @@ START_TEST(test_s21_sscanf) {
   pp2_def = pp2_s21 = (void *)0x80af1465;
   res_def = sscanf("0x80af1465", "%p", &pp1_def);
   res_s21 = s21_sscanf("0x80af1465", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = NULL;
   res_def = sscanf("0", "%p", &pp1_def);
   res_s21 = s21_sscanf("0", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = (void *)0xFFFFFFFF;
   res_def = sscanf("0xFFFFFFFF", "%p", &pp1_def);
   res_s21 = s21_sscanf("0xFFFFFFFF", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = (void *)1;
   res_def = sscanf("-0x1", "%p", &pp1_def);
   res_s21 = s21_sscanf("-0x1", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_ne(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = (void *)0xFFFFFFFFFFFFFFFF;
   res_def = sscanf("0xFFFFFFFFFFFFFFFF", "%p", &pp1_def);
   res_s21 = s21_sscanf("0xFFFFFFFFFFFFFFFF", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = (void *)7;
   res_def = sscanf("NULL", "%p", &pp1_def);
   res_s21 = s21_sscanf("NULL", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 0);
-  ck_assert_int_eq(res_s21, 0);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_ne(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = (void *)0x71234645;
   res_def = sscanf("071234645", "%p", &pp1_def);
   res_s21 = s21_sscanf("071234645", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = (void *)0x8954;
   res_def = sscanf("8954", "%p", &pp1_def);
   res_s21 = s21_sscanf("8954", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
@@ -1503,60 +1427,52 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("123456789", "%5d", &value_def);
   res_s21 = s21_sscanf("123456789", "%5d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("0x12fa456789", "%5x", &value_def);
   res_s21 = s21_sscanf("0x12fa456789", "%5x", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("012fa456789", "%5o", &value_def);
   res_s21 = s21_sscanf("012fa456789", "%5o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("0x", "%5i", &value_def);
   res_s21 = s21_sscanf("0x", "%5i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 7;
   res_def = sscanf("0x1235", "%1x", &value_def);
   res_s21 = s21_sscanf("0x1235", "%1x", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 7;
   num_def = num_s21 = 0;
   res_def = sscanf("0x1235", "%1x%n", &value_def, &num_def);
   res_s21 = s21_sscanf("0x1235", "%1x%n", &value_s21, &num_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
   ck_assert_int_eq(num_def, num_s21);
 
   pp2_def = pp2_s21 = (void *)0x89;
   res_def = sscanf("8954", "%2p", &pp1_def);
   res_s21 = s21_sscanf("8954", "%2p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
   pp2_def = pp2_s21 = (void *)0x0;
   res_def = sscanf("0x", "%p", &pp1_def);
   res_s21 = s21_sscanf("0x", "%p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
@@ -1564,52 +1480,45 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("-123456789", "%5d", &value_def);
   res_s21 = s21_sscanf("-123456789", "%5d", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-0x12fa456789", "%5x", &value_def);
   res_s21 = s21_sscanf("-0x12fa456789", "%5x", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-012fa456789", "%5o", &value_def);
   res_s21 = s21_sscanf("-012fa456789", "%5o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-0x", "%5i", &value_def);
   res_s21 = s21_sscanf("-0x", "%5i", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 7;
   res_def = sscanf("-0x1235", "%1x", &value_def);
   res_s21 = s21_sscanf("-0x1235", "%1x", &value_s21);
-  ck_assert_int_eq(res_def, 0);
-  ck_assert_int_eq(res_s21, 0);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 7;
   num_def = num_s21 = 0;
   res_def = sscanf("-0x1235", "%1x%n", &value_def, &num_def);
   res_s21 = s21_sscanf("-0x1235", "%1x%n", &value_s21, &num_s21);
-  ck_assert_int_eq(res_def, 0);
-  ck_assert_int_eq(res_s21, 0);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
   ck_assert_int_eq(num_def, num_s21);
 
   pp2_def = pp2_s21 = (void *)-0x8;
   res_def = sscanf("-8954", "%2p", &pp1_def);
   res_s21 = s21_sscanf("-8954", "%2p", &pp1_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_ptr_eq(pp1_def, pp1_s21);
   ck_assert_ptr_eq(pp1_def, pp2_def);
 
@@ -1617,30 +1526,26 @@ START_TEST(test_s21_sscanf) {
   value_def = value_s21 = 0;
   res_def = sscanf("-123", "%u", &value_def);
   res_s21 = s21_sscanf("-123", "%u", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-0123", "%o", &value_def);
   res_s21 = s21_sscanf("-0123", "%o", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   res_def = sscanf("-0x123", "%x", &value_def);
   res_s21 = s21_sscanf("-0x123", "%x", &value_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
 
   value_def = value_s21 = 0;
   num_def = num_s21 = 0;
   res_def = sscanf("-123", "%u%n", &value_def, &num_def);
   res_s21 = s21_sscanf("-123", "%u%n", &value_s21, &num_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
   ck_assert_int_eq(num_def, num_s21);
 
@@ -1648,8 +1553,7 @@ START_TEST(test_s21_sscanf) {
   num_def = num_s21 = 0;
   res_def = sscanf("-0123", "%o%n", &value_def, &num_def);
   res_s21 = s21_sscanf("-0123", "%o%n", &value_s21, &num_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
   ck_assert_int_eq(num_def, num_s21);
 
@@ -1657,8 +1561,7 @@ START_TEST(test_s21_sscanf) {
   num_def = num_s21 = 0;
   res_def = sscanf("-0x123", "%x%n", &value_def, &num_def);
   res_s21 = s21_sscanf("-0x123", "%x%n", &value_s21, &num_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(value_def, value_s21);
   ck_assert_int_eq(num_def, num_s21);
 
@@ -1667,9 +1570,193 @@ START_TEST(test_s21_sscanf) {
   wchar_t wc_s21 = 0;
   res_def = sscanf("a", "%lc", &wc_def);
   res_s21 = s21_sscanf("a", "%lc", &wc_s21);
-  ck_assert_int_eq(res_def, 1);
-  ck_assert_int_eq(res_s21, 1);
+  ck_assert_int_eq(res_def, res_s21);
   ck_assert_int_eq(wc_def, wc_s21);
+
+  // floats
+  float fval_def, fval_s21;
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("0.1", "%e", &fval_def);
+  res_s21 = s21_sscanf("0.1", "%e", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("0.1", "%E", &fval_def);
+  res_s21 = s21_sscanf("0.1", "%E", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("0.1", "%f", &fval_def);
+  res_s21 = s21_sscanf("0.1", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("0.1", "%g", &fval_def);
+  res_s21 = s21_sscanf("0.1", "%g", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("0.1", "%G", &fval_def);
+  res_s21 = s21_sscanf("0.1", "%G", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("1.2E7", "%f", &fval_def);
+  res_s21 = s21_sscanf("1.2E7", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("1e0", "%f", &fval_def);
+  res_s21 = s21_sscanf("1e0", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("1e+0", "%f", &fval_def);
+  res_s21 = s21_sscanf("1e+0", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("-1E-5", "%f", &fval_def);
+  res_s21 = s21_sscanf("-1E-5", "%f", &fval_s21);
+  // union float_u {
+  //   float f;
+  //   uint32_t u;
+  // };
+  // union float_u def = {.f = fval_def};
+  // union float_u s21 = {.f = fval_s21};
+  // printf("def: %f\n   : 0x%" PRIx32 "\n", fval_def, def.u);
+  // printf("s21: %f\n   : 0x%" PRIx32 "\n", fval_s21, s21.u);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf("1E", "%f", &fval_def);
+  res_s21 = s21_sscanf("1E", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 0;
+  res_def = sscanf(".1e3", "%f", &fval_def);
+  res_s21 = s21_sscanf(".1e3", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 1;
+  res_def = sscanf("0E1", "%f", &fval_def);
+  res_s21 = s21_sscanf("0E1", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 1;
+  res_def = sscanf("12.3E2", "%f", &fval_def);
+  res_s21 = s21_sscanf("12.3E2", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 1;
+  res_def = sscanf("1.2E128", "%f", &fval_def);
+  res_s21 = s21_sscanf("1.2E128", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  fval_def = fval_s21 = 1;
+  res_def = sscanf("1.2E-128", "%f", &fval_def);
+  res_s21 = s21_sscanf("1.2E-128", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq_tol(fval_def, fval_s21, 1E-6);
+
+  fval_def = fval_s21 = 1;
+  res_def = sscanf(".", "%f", &fval_def);
+  res_s21 = s21_sscanf(".", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  // extra
+
+  fval_def = fval_s21 = 1;
+  res_def = sscanf(".02.3", "%*f%f", &fval_def);
+  res_s21 = s21_sscanf(".02.3", "%*f%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  // double
+  double dval_def, dval_s21;
+  dval_def = dval_s21 = 1;
+  res_def = sscanf("1.2E128", "%lf", &dval_def);
+  res_s21 = s21_sscanf("1.2E128", "%lf", &dval_s21);
+  // union double_u {
+  //   double f;
+  //   uint64_t u;
+  // };
+  // union double_u ddef = {.f = dval_def};
+  // union double_u fs21 = {.f = dval_s21};
+  // printf("def: %lf\n   : 0x%" PRIx64 "\n", fval_def, ddef.u);
+  // printf("s21: %lf\n   : 0x%" PRIx64 "\n", fval_s21, fs21.u);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_double_eq_tol(dval_def, dval_s21, 1E122);
+
+  dval_def = dval_s21 = 1;
+  res_def = sscanf("14123.23E-764", "%lf", &dval_def);
+  res_s21 = s21_sscanf("114123.23E-764", "%lf", &dval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_double_eq_tol(dval_def, dval_s21, 1E-6);
+
+  fval_def = fval_s21 = 1;
+  dval_def = dval_s21 = 1;
+  res_def = sscanf("7.51918915111644124123412412343", "%f", &fval_def);
+  res_s21 = s21_sscanf("7.51918915111644124123412412343", "%f", &fval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+
+  res_def = sscanf("7.51918915111644124123412412343", "%lf", &dval_def);
+  res_s21 = s21_sscanf("7.51918915111644124123412412343", "%lf", &dval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_double_eq(dval_def, dval_s21);
+  ck_assert_double_ne(dval_def, fval_def);
+  ck_assert_double_ne(dval_s21, fval_s21);
+
+  // ext float
+  if (sizeof(double) != sizeof(long double)) {
+    long double ldval_def, ldval_s21;
+    ldval_def = ldval_s21 = 1;
+    const char *really_long_float_string =
+        "5.5191891511164412412341241234351918915111644124123412412343";
+    res_def = sscanf(really_long_float_string, "%Lf", &ldval_def);
+    res_s21 = s21_sscanf(really_long_float_string, "%Lf", &ldval_s21);
+    ck_assert_int_eq(res_def, res_s21);
+    ck_assert_ldouble_eq_tol(ldval_def, ldval_s21, 1E-6);
+
+    res_def = sscanf(really_long_float_string, "%lf", &dval_def);
+    res_s21 = s21_sscanf(really_long_float_string, "%lf", &dval_s21);
+    ck_assert_int_eq(res_def, res_s21);
+    ck_assert_ldouble_ne(ldval_def, dval_def);
+    ck_assert_ldouble_ne(ldval_s21, dval_s21);
+  }
+
+  // floats with width
+  fval_def = fval_s21 = 1;
+  ch1_def = ch1_s21;
+  res_def = sscanf("7.519", "%3f%c", &fval_def, &ch1_def);
+  res_s21 = s21_sscanf("7.519", "%3f%c", &fval_s21, &ch1_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+  ck_assert_int_eq(ch1_def, ch1_s21);
+
+  fval_def = fval_s21 = 1;
+  ch1_def = ch1_s21;
+  res_def = sscanf("1E91", "%3f%c", &fval_def, &ch1_def);
+  res_s21 = s21_sscanf("1E91", "%3f%c", &fval_s21, &ch1_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_float_eq(fval_def, fval_s21);
+  ck_assert_int_eq(ch1_def, ch1_s21);
 }
 END_TEST
 
