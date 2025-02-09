@@ -13,6 +13,8 @@
 #include "test_s21_strncpy.h"
 #include "test_s21_strrchr.h"
 #include "test_s21_strstr.h"
+#include "test_s21_to_lower.h"
+#include "test_s21_to_upper.h"
 #include "test_s21_trim.h"
 
 int main() {
@@ -29,6 +31,8 @@ int main() {
   srunner_add_suite(sr, s21_memcmp_suite());
   srunner_add_suite(sr, s21_memcpy_suite());
   srunner_add_suite(sr, s21_trim_suite());
+  srunner_add_suite(sr, s21_to_lower_suite());
+  srunner_add_suite(sr, s21_to_upper_suite());
 
   srunner_run_all(sr, CK_NORMAL);
   number_failed = srunner_ntests_failed(sr);

@@ -146,14 +146,10 @@ START_TEST(test_trim_multiline) {
 }
 END_TEST
 
-
-
-
-
 Suite *s21_trim_suite(void) {
   Suite *s = suite_create("s21_trim");
   TCase *tc_core = tcase_create("Core");
-  
+
   tcase_add_test(tc_core, test_trim_empty);
   tcase_add_test(tc_core, test_trim_symbols);
   tcase_add_test(tc_core, test_trim_full_trim);
