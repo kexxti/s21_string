@@ -143,44 +143,36 @@ bool needs_dest(current_format* settings) {
 
 void* get_next_dest(current_format* settings, va_list args) {
   void* dest = NULL;
-  switch (settings->type_modifier) {
-    case CHAR:
-    case STRING:
-      if (settings->length_modifier == LONG)
-        dest = va_arg(args, wchar_t*);
-      else
-        dest = va_arg(args, char*);
-      break;
-    case INTEGER:
-    case DECIMAL:
-    case NUMBER:
-      if (settings->length_modifier == NONE)
-        dest = va_arg(args, int*);
-      else if (settings->length_modifier == SHORT)
-        dest = va_arg(args, short int*);
-      else if (settings->length_modifier == LONG)
-        dest = va_arg(args, long int*);
-      break;
-    case UOCTAL:
-    case UHEX:
-    case UDECIMAL:
-      if (settings->length_modifier == NONE)
-        dest = va_arg(args, unsigned int*);
-      else if (settings->length_modifier == SHORT)
-        dest = va_arg(args, unsigned short int*);
-      else if (settings->length_modifier == LONG)
-        dest = va_arg(args, unsigned long int*);
-      break;
-    case FLOAT:
-      if (settings->length_modifier == NONE)
-        dest = va_arg(args, float*);
-      else if (settings->length_modifier == LONG)
-        dest = va_arg(args, double*);
-      else if (settings->length_modifier == EXTENDED_DOUBLE)
-        dest = va_arg(args, long double*);
-      break;
-    default:
-      break;
+  if (settings->type_modifier == CHAR || settings->type_modifier == STRING) {
+    if (settings->length_modifier == LONG)
+      dest = va_arg(args, wchar_t*);
+    else
+      dest = va_arg(args, char*);
+  } else if (settings->type_modifier == INTEGER ||
+             settings->type_modifier == DECIMAL ||
+             settings->type_modifier == NUMBER) {
+    if (settings->length_modifier == NONE)
+      dest = va_arg(args, int*);
+    else if (settings->length_modifier == SHORT)
+      dest = va_arg(args, short int*);
+    else if (settings->length_modifier == LONG)
+      dest = va_arg(args, long int*);
+  } else if (settings->type_modifier == UOCTAL ||
+             settings->type_modifier == UHEX ||
+             settings->type_modifier == UDECIMAL) {
+    if (settings->length_modifier == NONE)
+      dest = va_arg(args, unsigned int*);
+    else if (settings->length_modifier == SHORT)
+      dest = va_arg(args, unsigned short int*);
+    else if (settings->length_modifier == LONG)
+      dest = va_arg(args, unsigned long int*);
+  } else if (settings->type_modifier == FLOAT) {
+    if (settings->length_modifier == NONE)
+      dest = va_arg(args, float*);
+    else if (settings->length_modifier == LONG)
+      dest = va_arg(args, double*);
+    else if (settings->length_modifier == EXTENDED_DOUBLE)
+      dest = va_arg(args, long double*);
   }
   return dest;
 }
