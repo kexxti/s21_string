@@ -6,23 +6,10 @@ s21_size_t s21_strrspn(const char *str1, const char *str2) {
 
   while (end > str1) {
     end--;
-    int found_flag = 0;
-    const char *s = str2;
-
-    while (*s) {
-      if (*end == *s) {
-        found_flag = 1;
-        break;
-      }
-      s++;
-    }
-
-    if (!found_flag) {
+    if (!s21_strchr(str2, *end)) {
       break;
     }
-
     count++;
   }
-
   return count;
 }
