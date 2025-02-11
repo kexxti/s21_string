@@ -96,5 +96,4 @@ s21_size_t s21_strspn(const char *str1, const char *str2);
 
 /* Works exactly the same as s21_strspn but operates from the end of str1  */
 s21_size_t s21_strrspn(const char *str1, const char *str2);
-
 #endif
