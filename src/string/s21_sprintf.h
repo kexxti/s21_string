@@ -25,23 +25,22 @@ typedef enum LENGTH { NONE, SHORT, LONG, EXTENDED_DOUBLE } LENGTH;
 
 // Структура current_format (имя оставлено, как в s21_sscanf)
 typedef struct current_format {
-  bool is_symbol;        // Если нет спецификатора - просто символ для вывода
-  char matching_symbol;  // Если is_symbol==true, этот символ выводится
+  bool is_symbol; // Если нет спецификатора - просто символ для вывода
+  char matching_symbol; // Если is_symbol==true, этот символ выводится
 
-  bool left_align;  // Флаг '-'
-  bool force_sign;  // Флаг '+'
-  bool space;       // Флаг ' ' (пробел)
-  bool alt_form;    // Флаг '#'
-  bool zero_pad;    // Флаг '0'
+  bool left_align; // Флаг '-'
+  bool force_sign; // Флаг '+'
+  bool space;      // Флаг ' ' (пробел)
+  bool alt_form;   // Флаг '#'
+  bool zero_pad;   // Флаг '0'
 
-  s21_size_t width;  // Минимальная ширина поля
+  s21_size_t width; // Минимальная ширина поля
   bool precision_specified;
-  s21_size_t precision;  // Значение точности
+  s21_size_t precision; // Значение точности
 
-  LENGTH length_modifier;  // Модификатор длины (h, l, L)
-  MODIFIER type_modifier;  // Тип спецификатора
-  char
-      spec;  // Фактический символ спецификатора (например, 'f', 'e', 'g', etc.)
+  LENGTH length_modifier; // Модификатор длины (h, l, L)
+  MODIFIER type_modifier; // Тип спецификатора
+  char spec; // Фактический символ спецификатора (например, 'f', 'e', 'g', etc.)
 } current_format;
 
 int s21_sprintf(char *str, const char *format, ...);
@@ -64,4 +63,4 @@ int format_float_sci(double val, int prec, char *buffer, bool uppercase);
 int format_pointer(va_list args, char *buffer);
 void write_padding(char **dest, int pad, char pad_char, int *written);
 
-#endif  // S21_SPRINTF_H
+#endif // S21_SPRINTF_H

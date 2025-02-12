@@ -16,7 +16,7 @@ int s21_sprintf(char *str, const char *format, ...) {
       *dest++ = *format++;
       written++;
     } else {
-      format++;  // пропускаем '%'
+      format++; // пропускаем '%'
       if (*format == '%') {
         *dest++ = '%';
         written++;
@@ -39,7 +39,8 @@ int s21_sprintf(char *str, const char *format, ...) {
 // Выделение памяти для current_format
 current_format *init_format() {
   current_format *cf = (current_format *)malloc(sizeof(current_format));
-  if (cf) fill_format_default(cf);
+  if (cf)
+    fill_format_default(cf);
   return cf;
 }
 
@@ -64,23 +65,23 @@ void fill_format_default(current_format *cf) {
 void parse_flags(const char **format, current_format *cf) {
   while (**format) {
     switch (**format) {
-      case '-':
-        cf->left_align = true;
-        break;
-      case '+':
-        cf->force_sign = true;
-        break;
-      case ' ':
-        cf->space = true;
-        break;
-      case '#':
-        cf->alt_form = true;
-        break;
-      case '0':
-        cf->zero_pad = true;
-        break;
-      default:
-        return;
+    case '-':
+      cf->left_align = true;
+      break;
+    case '+':
+      cf->force_sign = true;
+      break;
+    case ' ':
+      cf->space = true;
+      break;
+    case '#':
+      cf->alt_form = true;
+      break;
+    case '0':
+      cf->zero_pad = true;
+      break;
+    default:
+      return;
     }
     (*format)++;
   }
@@ -132,44 +133,45 @@ void read_format(const char **format, current_format *cf, va_list args) {
   }
   cf->spec = **format;
   switch (cf->spec) {
-    case 'c':
-      cf->type_modifier = CHAR;
-      break;
-    case 's':
-      cf->type_modifier = STRING;
-      break;
-    case 'd':
-    case 'i':
-      cf->type_modifier = DECIMAL;
-      break;
-    case 'u':
-      cf->type_modifier = UDECIMAL;
-      break;
-    case 'o':
-      cf->type_modifier = UOCTAL;
-      break;
-    case 'x':
-    case 'X':
-      cf->type_modifier = UHEX;
-      break;
-    case 'p':
-      cf->type_modifier = POINTER;
-      break;
-    case 'n':
-      cf->type_modifier = NUMBER;
-      break;
-    case 'f':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-      cf->type_modifier = FLOAT;
-      break;
-    default:
-      cf->type_modifier = ERR;
-      break;
+  case 'c':
+    cf->type_modifier = CHAR;
+    break;
+  case 's':
+    cf->type_modifier = STRING;
+    break;
+  case 'd':
+  case 'i':
+    cf->type_modifier = DECIMAL;
+    break;
+  case 'u':
+    cf->type_modifier = UDECIMAL;
+    break;
+  case 'o':
+    cf->type_modifier = UOCTAL;
+    break;
+  case 'x':
+  case 'X':
+    cf->type_modifier = UHEX;
+    break;
+  case 'p':
+    cf->type_modifier = POINTER;
+    break;
+  case 'n':
+    cf->type_modifier = NUMBER;
+    break;
+  case 'f':
+  case 'e':
+  case 'E':
+  case 'g':
+  case 'G':
+    cf->type_modifier = FLOAT;
+    break;
+  default:
+    cf->type_modifier = ERR;
+    break;
   }
-  if (**format) (*format)++;
+  if (**format)
+    (*format)++;
 }
 
 // Приведение формата к корректному виду для спецификатора '%'
@@ -218,7 +220,8 @@ int itoa_custom(long long num, char *buf, int base, bool uppercase) {
           (rem < 10) ? ('0' + rem) : ((uppercase ? 'A' : 'a') + rem - 10);
       num /= base;
     }
-    if (neg) buf[i++] = '-';
+    if (neg)
+      buf[i++] = '-';
   }
   reverse_str(buf, i);
   buf[i] = '\0';
@@ -254,7 +257,8 @@ int format_char(va_list args, char *buffer) {
 // Форматирование строки (%s)
 int format_string(current_format *cf, va_list args, char *buffer) {
   char *s = va_arg(args, char *);
-  if (!s) s = "(null)";
+  if (!s)
+    s = "(null)";
   int i = 0;
   while (s[i] && (!cf->precision_specified || i < (int)cf->precision)) {
     buffer[i] = s[i];
@@ -375,46 +379,47 @@ void apply_format(char **dest, current_format *cf, va_list args, int *written) {
   char temp[1024] = {0};
   int len = 0;
   switch (cf->type_modifier) {
-    case CHAR:
-      len = format_char(args, temp);
-      break;
-    case STRING:
-      len = format_string(cf, args, temp);
-      break;
-    case DECIMAL:
-    case INTEGER:
-      len = format_decimal(cf, args, temp);
-      break;
-    case UDECIMAL:
-      len = format_unsigned(cf, args, temp, 10, false);
-      break;
-    case UOCTAL:
-      len = format_unsigned(cf, args, temp, 8, false);
-      break;
-    case UHEX:
-      bool up = (cf->spec == 'X');
-      len = format_unsigned(cf, args, temp, 16, up);
-      break;
-    case POINTER:
-      len = format_pointer(args, temp);
-      break;
-    case FLOAT:
-      len = format_float(cf, args, temp);
-      break;
-    case NUMBER:
-      int *n_ptr = va_arg(args, int *);
-      if (n_ptr) *n_ptr = *written;
-      return;
-    case PERCENT:
-      temp[0] = '%';
-      temp[1] = '\0';
-      len = 1;
-      break;
-    default:
-      temp[0] = cf->spec;
-      temp[1] = '\0';
-      len = 1;
-      break;
+  case CHAR:
+    len = format_char(args, temp);
+    break;
+  case STRING:
+    len = format_string(cf, args, temp);
+    break;
+  case DECIMAL:
+  case INTEGER:
+    len = format_decimal(cf, args, temp);
+    break;
+  case UDECIMAL:
+    len = format_unsigned(cf, args, temp, 10, false);
+    break;
+  case UOCTAL:
+    len = format_unsigned(cf, args, temp, 8, false);
+    break;
+  case UHEX:
+    bool up = (cf->spec == 'X');
+    len = format_unsigned(cf, args, temp, 16, up);
+    break;
+  case POINTER:
+    len = format_pointer(args, temp);
+    break;
+  case FLOAT:
+    len = format_float(cf, args, temp);
+    break;
+  case NUMBER:
+    int *n_ptr = va_arg(args, int *);
+    if (n_ptr)
+      *n_ptr = *written;
+    return;
+  case PERCENT:
+    temp[0] = '%';
+    temp[1] = '\0';
+    len = 1;
+    break;
+  default:
+    temp[0] = cf->spec;
+    temp[1] = '\0';
+    len = 1;
+    break;
   }
   int pad = (cf->width > (s21_size_t)len) ? cf->width - len : 0;
   if (!cf->left_align)
@@ -424,5 +429,6 @@ void apply_format(char **dest, current_format *cf, va_list args, int *written) {
   s21_memcpy(*dest, temp, len);
   *dest += len;
   *written += len;
-  if (cf->left_align) write_padding(dest, pad, ' ', written);
+  if (cf->left_align)
+    write_padding(dest, pad, ' ', written);
 }
