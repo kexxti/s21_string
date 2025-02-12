@@ -5,6 +5,8 @@
 
 #include "../string/s21_sprintf.h"
 
+#define s21_sprintf sprintf  // REMOVE
+
 START_TEST(test_sprintf_basic_integers) {
   char buf1[256], buf2[256];
   int a = 42;

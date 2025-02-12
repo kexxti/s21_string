@@ -1,6 +1,7 @@
 #include "s21_strerror.h"
 
-#include <stdio.h>  // REMOVE
+#include <stdio.h>           // REMOVE
+#define s21_sprintf sprintf  // REMOVE
 
 char *s21_strerror(int errnum) {
   static char buff[256];
@@ -8,9 +9,9 @@ char *s21_strerror(int errnum) {
     s21_memcpy(buff, S21_ERRORS[errnum], s21_strlen(S21_ERRORS[errnum]) + 1);
   else {
 #ifdef __linux__
-    sprintf(buff, "Unknown error %d", errnum);  // CHANGE TO S21_SPRINTF
+    s21_sprintf(buff, "Unknown error %d", errnum);
 #elif defined(__APPLE__)
-    sprintf(buff, "Unknown error: %d", errnum);  // CHANGE TO S21_SPRINTF
+    s21_sprintf(buff, "Unknown error: %d", errnum);
 #endif
   }
   return buff;

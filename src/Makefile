@@ -40,7 +40,8 @@ gcov_report: tests/*.c $(SRC_FILES)
 test_leaks: tests/*.c s21_string.a
 	$(CC) $(CFLAGS) $(GCOV_FLAGS) $^ -o $(LOGS_F)/$@ $(LDLIBS)
 ifeq ($(OS),Darwin)
-	leaks -atExit -- ./$(LOGS_F)/$@ | grep LEAK:
+	leaks -atExit -- ./$(LOGS_F)/$@ > $(LOGS_F)/leaks.log
+	grep -n "LEAK:" $(LOGS_F)/leaks.log
 else ifeq ($(OS),Linux)
 	valgrind --leak-check=full --log-file=$(LOGS_F)/valgrind.log ./$(LOGS_F)/$@
 	grep -n "ERROR SUMMARY:" $(LOGS_F)/valgrind.log | grep -v "0 errors" ||:

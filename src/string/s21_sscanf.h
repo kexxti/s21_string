@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
-#include <stdio.h>
+#include <stdio.h>  // for EOF
 
 #include "s21_string.h"
 
