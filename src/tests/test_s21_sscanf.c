@@ -527,20 +527,13 @@ START_TEST(test_default_sscanf) {
   ck_assert_int_eq(res, 1);
   ck_assert_double_ne(dval, fval);
 
-// ext float
-#ifndef VALGRIND
-  if (sizeof(double) != sizeof(long double)) {
-    long double ldval = 1;
-    dval = 1;
-    const char *really_long_float_string =
-        "5.5191891511164412412341241234351918915111644124123412412343";
-    res = sscanf(really_long_float_string, "%Lf", &ldval);
-    ck_assert_int_eq(res, 1);
-    res = sscanf(really_long_float_string, "%lf", &dval);
-    ck_assert_int_eq(res, 1);
-    ck_assert_ldouble_ne(ldval, dval);
-  }
-#endif
+  // ext float
+  long double ldval = 1;
+  const char *really_long_float_string =
+      "5.5191891511164412412341241234351918915111644124123412412343";
+  res = sscanf(really_long_float_string, "%Lf", &ldval);
+  ck_assert_int_eq(res, 1);
+  ck_assert_ldouble_eq(ldval, strtold(really_long_float_string, NULL));
 
   // extra
   fval = 1;
@@ -1674,7 +1667,6 @@ START_TEST(test_s21_sscanf) {
   ck_assert_float_eq(fval_def, fval_s21);
 
   // extra
-
   fval_def = fval_s21 = 1;
   res_def = sscanf(".02.3", "%*f%f", &fval_def);
   res_s21 = s21_sscanf(".02.3", "%*f%f", &fval_s21);
@@ -1709,25 +1701,14 @@ START_TEST(test_s21_sscanf) {
   ck_assert_double_ne(dval_def, fval_def);
   ck_assert_double_ne(dval_s21, fval_s21);
 
-// ext float
-#ifndef VALGRIND
-  if (sizeof(double) != sizeof(long double)) {
-    long double ldval_def, ldval_s21;
-    ldval_def = ldval_s21 = 1;
-    const char *really_long_float_string =
-        "5.5191891511164412412341241234351918915111644124123412412343";
-    res_def = sscanf(really_long_float_string, "%Lf", &ldval_def);
-    res_s21 = s21_sscanf(really_long_float_string, "%Lf", &ldval_s21);
-    ck_assert_int_eq(res_def, res_s21);
-    ck_assert_ldouble_eq_tol(ldval_def, ldval_s21, 1E-6);
-
-    res_def = sscanf(really_long_float_string, "%lf", &dval_def);
-    res_s21 = s21_sscanf(really_long_float_string, "%lf", &dval_s21);
-    ck_assert_int_eq(res_def, res_s21);
-    ck_assert_ldouble_ne(ldval_def, dval_def);
-    ck_assert_ldouble_ne(ldval_s21, dval_s21);
-  }
-#endif
+  long double ldval_def, ldval_s21;
+  ldval_def = ldval_s21 = 1;
+  const char *really_long_float_string =
+      "5.5191891511164412412341241234351918915111644124123412412343";
+  res_def = sscanf(really_long_float_string, "%Lf", &ldval_def);
+  res_s21 = s21_sscanf(really_long_float_string, "%Lf", &ldval_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_ldouble_eq_tol(ldval_def, ldval_s21, 1E-6);
 
   // floats with width
   fval_def = fval_s21 = 1;
@@ -1745,6 +1726,25 @@ START_TEST(test_s21_sscanf) {
   ck_assert_int_eq(res_def, res_s21);
   ck_assert_float_eq(fval_def, fval_s21);
   ck_assert_int_eq(ch1_def, ch1_s21);
+
+  // number of read
+  res_def = res_s21 = 0;
+  short_value_def = short_value_s21 = 0;
+  const char *n_string =
+      "1iuagsdhbgkn lk 4123inkasdfg nafsdfpeowq rweqnzxcm,vkfdsa";
+  res_def = sscanf(n_string, "%*d%*c%*s %*s%*d%hn%*s", &short_value_def);
+  res_s21 = s21_sscanf(n_string, "%*d%*c%*s %*s%*d%hn%*s", &short_value_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_str_eq(str_def, str_s21);
+  ck_assert_int_eq(value_def, value_s21);
+
+  res_def = res_s21 = 0;
+  long_value_def = long_value_s21 = 0;
+  res_def = sscanf(n_string, "%*d%*c%*s %*s%*d%*s%ln", &long_value_def);
+  res_s21 = s21_sscanf(n_string, "%*d%*c%*s %*s%*d%*s%ln", &long_value_s21);
+  ck_assert_int_eq(res_def, res_s21);
+  ck_assert_str_eq(str_def, str_s21);
+  ck_assert_int_eq(value_def, value_s21);
 }
 END_TEST
 
