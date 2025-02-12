@@ -232,8 +232,8 @@ END_TEST
 
 START_TEST(test_sprintf_empty_format) {
   char buf1[256], buf2[256];
-  sprintf(buf1, "");
-  s21_sprintf(buf2, "");
+  sprintf(buf1, "%s", "");
+  s21_sprintf(buf2, "%s", "");
   ck_assert_str_eq(buf1, buf2);
 }
 END_TEST
