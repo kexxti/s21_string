@@ -160,7 +160,7 @@ static const char *S21_ERRORS[] = {
     "Permission denied",                  // 13 EACCES
     "Bad address",                        // 14 EFAULT
     "Block device required",              // 15 ENOTBLK
-    "Device / Resource busy",             // 16 EBUSY
+    "Resource busy",                      // 16 EBUSY
     "File exists",                        // 17 EEXIST
     "Cross-device link",                  // 18 EXDEV
     "Operation not supported by device",  // 19 ENODEV
@@ -219,7 +219,7 @@ static const char *S21_ERRORS[] = {
     "Too many levels of remote in path",                // 71 EREMOTE
     "RPC struct is bad",                                // 72 EBADRPC
     "RPC version wrong",                                // 73 ERPCMISMATCH
-    "RPC prog. not avail.",                             // 74 EPROGUNAVAIL
+    "RPC prog. not avail",                              // 74 EPROGUNAVAIL
     "Program version wrong",                            // 75 EPROGMISMATCH
     "Bad procedure for program",                        // 76 EPROCUNAVAIL
     "No locks available",                               // 77 ENOLCK
@@ -228,27 +228,27 @@ static const char *S21_ERRORS[] = {
     "Authentication error",                             // 80 EAUTH
     "Need authenticator",                               // 81 ENEEDAUTH
     "Device power is off",                              // 82 EPWROFF
-    "Device error, e.g. paper out",                     // 83 EDEVERR
+    "Device error",                                     // 83 EDEVERR
     "Value too large to be stored in data type",        // 84 EOVERFLOW
-    "Bad executable",                                   // 85 EBADEXEC
+    "Bad executable (or shared library)",               // 85 EBADEXEC
     "Bad CPU type in executable",                       // 86 EBADARCH
     "Shared library version mismatch",                  // 87 ESHLIBVERS
-    "Malformed Macho file",                             // 88 EBADMACHO
+    "Malformed Mach-o file",                            // 88 EBADMACHO
     "Operation canceled",                               // 89 ECANCELED
     "Identifier removed",                               // 90 EIDRM
     "No message of desired type",                       // 91 ENOMSG
     "Illegal byte sequence",                            // 92 EILSEQ
     "Attribute not found",                              // 93 ENOATTR
     "Bad message",                                      // 94 EBADMSG
-    "Reserved",                                         // 95 EMULTIHOP
+    "EMULTIHOP (Reserved)",                             // 95 EMULTIHOP
     "No message available on STREAM",                   // 96 ENODATA
-    "Reserved",                                         // 97 ENOLINK
+    "ENOLINK (Reserved)",                               // 97 ENOLINK
     "No STREAM resources",                              // 98 ENOSR
     "Not a STREAM",                                     // 99 ENOSTR
     "Protocol error",                                   // 100 EPROTO
     "STREAM ioctl timeout",                             // 101 ETIME
     "Operation not supported on socket",                // 102 EOPNOTSUPP
-    "No such policy registered",                        // 103 ENOPOLICY
+    "Policy not found",                                 // 103 ENOPOLICY
     "State not recoverable",                            // 104 ENOTRECOVERABLE
     "Previous owner died",                              // 105 EOWNERDEAD
     "Interface output queue is full"  // 106 EQFULL probably also ELAST

@@ -38,9 +38,14 @@ gcov_report: tests/*.c $(SRC_FILES)
 	genhtml $(LOGS_F)/$(TEST_TARGET).info -o $(HTML_F)
 
 test_leaks: tests/*.c s21_string.a
+ifeq ($(OS),Darwin)
+	$(CC) $(CFLAGS) $(GCOV_FLAGS) $^ -o $(LOGS_F)/$@ $(LDLIBS)
+	leaks -atExit -- ./$(LOGS_F)/$@ | grep LEAK:
+else ifeq ($(OS),Linux)
 	$(CC) $(CFLAGS) $(GCOV_FLAGS) $^ -o $(LOGS_F)/$@ $(LDLIBS) -DVALGRIND
 	valgrind --leak-check=full --log-file=$(LOGS_F)/valgrind.log ./$(LOGS_F)/$@
 	grep -n "ERROR SUMMARY:" $(LOGS_F)/valgrind.log | grep -v "0 errors" ||:
+endif
 
 clean:
 	rm -f $(OBJ_FILES)
