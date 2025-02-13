@@ -23,7 +23,7 @@ int s21_sprintf(char *str, const char *format, ...) {
         format++;
         continue;
       }
-      current_format *cf = s21_sprintf_init_format();
+      print_format *cf = s21_sprintf_init_format();
       s21_sprintf_fill_format_default(cf);
       s21_sprintf_read_format(&format, cf, args);
       s21_sprintf_normalize_format(cf);
@@ -37,14 +37,14 @@ int s21_sprintf(char *str, const char *format, ...) {
 }
 
 // Выделение памяти для current_format
-current_format *s21_sprintf_init_format() {
-  current_format *cf = (current_format *)malloc(sizeof(current_format));
+print_format *s21_sprintf_init_format() {
+  print_format *cf = (print_format *)malloc(sizeof(print_format));
   if (cf) s21_sprintf_fill_format_default(cf);
   return cf;
 }
 
 // Инициализация значений по умолчанию
-void s21_sprintf_fill_format_default(current_format *cf) {
+void s21_sprintf_fill_format_default(print_format *cf) {
   cf->is_symbol = false;
   cf->matching_symbol = '\0';
   cf->left_align = false;
@@ -61,7 +61,7 @@ void s21_sprintf_fill_format_default(current_format *cf) {
 }
 
 // Вспомогательная функция для разбора флагов
-void s21_sprintf_parse_flags(const char **format, current_format *cf) {
+void s21_sprintf_parse_flags(const char **format, print_format *cf) {
   while (**format) {
     switch (**format) {
       case '-':
@@ -117,7 +117,7 @@ s21_size_t s21_sprintf_get_precision(const char **format, va_list args) {
 }
 
 // Разбор спецификатора формата
-void s21_sprintf_read_format(const char **format, current_format *cf,
+void s21_sprintf_read_format(const char **format, print_format *cf,
                              va_list args) {
   s21_sprintf_parse_flags(format, cf);
   cf->width = s21_sprintf_get_width(format, args);
@@ -174,7 +174,7 @@ void s21_sprintf_read_format(const char **format, current_format *cf,
 }
 
 // Приведение формата к корректному виду для спецификатора '%'
-void s21_sprintf_normalize_format(current_format *cf) {
+void s21_sprintf_normalize_format(print_format *cf) {
   if (cf->type_modifier == PERCENT) {
     cf->is_symbol = true;
     cf->matching_symbol = '%';
@@ -256,7 +256,7 @@ int s21_sprintf_format_char(va_list args, char *buffer) {
 }
 
 // Форматирование строки (%s)
-int s21_sprintf_format_string(current_format *cf, va_list args, char *buffer) {
+int s21_sprintf_format_string(print_format *cf, va_list args, char *buffer) {
   char *s = va_arg(args, char *);
   if (!s) s = "(null)";
   int i = 0;
@@ -269,7 +269,7 @@ int s21_sprintf_format_string(current_format *cf, va_list args, char *buffer) {
 }
 
 // Форматирование знакового целого (%d/%i)
-int s21_sprintf_format_decimal(current_format *cf, va_list args, char *buffer) {
+int s21_sprintf_format_decimal(print_format *cf, va_list args, char *buffer) {
   long long num;
   if (cf->length_modifier == LONG)
     num = va_arg(args, long);
@@ -292,7 +292,7 @@ int s21_sprintf_format_decimal(current_format *cf, va_list args, char *buffer) {
 }
 
 // Форматирование беззнакового целого (%u, %o, %x/%X)
-int s21_sprintf_format_unsigned(current_format *cf, va_list args, char *buffer,
+int s21_sprintf_format_unsigned(print_format *cf, va_list args, char *buffer,
                                 int base, bool uppercase) {
   unsigned long long num;
   if (cf->length_modifier == LONG)
@@ -319,7 +319,7 @@ int s21_sprintf_format_unsigned(current_format *cf, va_list args, char *buffer,
 }
 
 // Форматирование чисел с плавающей точкой - стандартное представление (%f)
-int s21_sprintf_format_float(current_format *cf, va_list args, char *buffer) {
+int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
   double val = va_arg(args, double);
   int prec = cf->precision_specified ? cf->precision : 6;
   int pos = 0;
@@ -413,7 +413,7 @@ int s21_sprintf_format_pointer(va_list args, char *buffer) {
 
 // Функция форматирования: выбирает нужный обработчик, вычисляет padding и
 // записывает результат
-void s21_sprintf_apply_format(char **dest, current_format *cf, va_list args,
+void s21_sprintf_apply_format(char **dest, print_format *cf, va_list args,
                               int *written) {
   char temp[1024] = {0};
   int len = 0;

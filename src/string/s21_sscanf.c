@@ -7,18 +7,18 @@ int s21_sscanf(const char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);
   bool is_scan_failed = false;
-  current_format *settings = init_format();
+  scan_format *settings = init_scan_format();
   while (!is_scan_failed && s21_strlen(format) > 0) {
-    fill_format_default(settings);
-    read_format(&format, settings);
-    normalize_format(settings);
+    fill_scan_format_default(settings);
+    read_scan_format(&format, settings);
+    normalize_scan_format(settings);
     void *dest = NULL;
     void **pointer_dest = NULL;
-    if (needs_dest(settings)) {
+    if (needs_scan_dest(settings)) {
       if (settings->type_modifier == POINTER)
         pointer_dest = va_arg(args, void **);
       else
-        dest = get_next_dest(settings, args);
+        dest = get_next_scan_dest(settings, args);
     }
     const char *temp = str;  // to track EOF
     is_scan_failed =
@@ -35,13 +35,13 @@ int s21_sscanf(const char *str, const char *format, ...) {
   return successful_scans_count;
 }
 
-current_format *init_format() {
-  current_format *ptr = malloc(sizeof(current_format));
-  if (ptr) fill_format_default(ptr);
+scan_format *init_scan_format() {
+  scan_format *ptr = malloc(sizeof(scan_format));
+  if (ptr) fill_scan_format_default(ptr);
   return ptr;
 }
 
-void fill_format_default(current_format *settings) {
+void fill_scan_format_default(scan_format *settings) {
   settings->is_symbol = false;
   settings->matching_symbol = '\0';
   settings->ignore_whitespaces = false;
@@ -51,7 +51,7 @@ void fill_format_default(current_format *settings) {
   settings->type_modifier = ERR;
 }
 
-void read_format(const char **format, current_format *settings) {
+void read_scan_format(const char **format, scan_format *settings) {
   int ch;
   while (isspace((ch = **format))) {
     settings->ignore_whitespaces = true;
@@ -67,16 +67,16 @@ void read_format(const char **format, current_format *settings) {
       settings->ignore = true;
       (*format)++;
     }
-    settings->width = get_width(format);
-    settings->length_modifier = get_length(**format);
+    settings->width = get_scan_width(format);
+    settings->length_modifier = get_scan_length(**format);
     if (settings->length_modifier) (*format)++;
-    settings->type_modifier = get_modifier(**format);  // what if ERR ? !!!
+    settings->type_modifier = get_scan_modifier(**format);  // what if ERR ? !!!
     if (settings->type_modifier) (*format)++;
   }
 }
 
-LENGTH get_length(const char ch) {
-  LENGTH mod = NONE;
+SCAN_LENGTH get_scan_length(const char ch) {
+  SCAN_LENGTH mod = NONE;
   if (ch == 'h')
     mod = SHORT;
   else if (ch == 'l')
@@ -86,8 +86,8 @@ LENGTH get_length(const char ch) {
   return mod;
 }
 
-MODIFIER get_modifier(const char ch) {
-  MODIFIER mod = ERR;
+SCAN_MODIFIER get_scan_modifier(const char ch) {
+  SCAN_MODIFIER mod = ERR;
   if (ch == 'c')
     mod = CHAR;
   else if (ch == 'd')
@@ -113,7 +113,7 @@ MODIFIER get_modifier(const char ch) {
   return mod;
 }
 
-s21_size_t get_width(const char **format) {
+s21_size_t get_scan_width(const char **format) {
   s21_size_t width = 0;
   while (isdigit(**format)) {
     width = width * 10 + (**format - '0');
@@ -122,7 +122,7 @@ s21_size_t get_width(const char **format) {
   return width;
 }
 
-void normalize_format(current_format *settings) {
+void normalize_scan_format(scan_format *settings) {
   // add check to width > 0 and return whether format is possible?
   if (settings->type_modifier == PERCENT) {
     settings->is_symbol = true;
@@ -133,7 +133,7 @@ void normalize_format(current_format *settings) {
     settings->ignore_whitespaces = true;
 }
 
-bool needs_dest(current_format *settings) {
+bool needs_scan_dest(scan_format *settings) {
   bool result = true;
   if (settings->ignore || settings->is_symbol ||
       settings->type_modifier == PERCENT)
@@ -141,7 +141,7 @@ bool needs_dest(current_format *settings) {
   return result;
 }
 
-void *get_next_dest(current_format *settings, va_list args) {
+void *get_next_scan_dest(scan_format *settings, va_list args) {
   void *dest = NULL;
   if (settings->type_modifier == CHAR || settings->type_modifier == STRING) {
     if (settings->length_modifier == LONG)
@@ -177,7 +177,7 @@ void *get_next_dest(current_format *settings, va_list args) {
   return dest;
 }
 
-bool get_symbol(const char **str, current_format *settings,
+bool get_symbol(const char **str, scan_format *settings,
                 int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -188,7 +188,7 @@ bool get_symbol(const char **str, current_format *settings,
   return is_scan_succeded;
 }
 
-bool get_char(const char **str, current_format *settings, void *dest,
+bool get_char(const char **str, scan_format *settings, void *dest,
               int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -226,7 +226,7 @@ void atoi_move_to_next(s21_size_t *length, const char **str,
   goto_next_char(length, str, read_bytes_count);
   if (!*is_scan_succeded) *is_scan_succeded = true;
 }
-int s21_atoi(const char **str, current_format *settings, int *read_bytes_count,
+int s21_atoi(const char **str, scan_format *settings, int *read_bytes_count,
              bool *is_scan_succeded) {
   int result = 0;
   s21_size_t length = 0;
@@ -239,7 +239,7 @@ int s21_atoi(const char **str, current_format *settings, int *read_bytes_count,
   return result;
 }
 
-short int s21_atosi(const char **str, current_format *settings,
+short int s21_atosi(const char **str, scan_format *settings,
                     int *read_bytes_count, bool *is_scan_succeded) {
   short int result = 0;
   s21_size_t length = 0;
@@ -252,7 +252,7 @@ short int s21_atosi(const char **str, current_format *settings,
   return result;
 }
 
-long int s21_atol(const char **str, current_format *settings,
+long int s21_atol(const char **str, scan_format *settings,
                   int *read_bytes_count, bool *is_scan_succeded) {
   long int result = 0;
   s21_size_t length = 0;
@@ -265,7 +265,7 @@ long int s21_atol(const char **str, current_format *settings,
   return result;
 }
 
-bool get_decimal(const char **str, current_format *settings, void *dest,
+bool get_decimal(const char **str, scan_format *settings, void *dest,
                  int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -288,7 +288,7 @@ void skip_whitespaces(const char **str, int *read_bytes_count) {
   while (isspace(**str)) goto_next_char(NULL, str, read_bytes_count);
 }
 
-bool get_udecimal(const char **str, current_format *settings, void *dest,
+bool get_udecimal(const char **str, scan_format *settings, void *dest,
                   int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -310,7 +310,7 @@ bool get_udecimal(const char **str, current_format *settings, void *dest,
   return is_scan_succeded;
 }
 
-int s21_a_to_octali(const char **str, current_format *settings,
+int s21_a_to_octali(const char **str, scan_format *settings,
                     int *read_bytes_count, bool *is_scan_succeded) {
   int result = 0;
   s21_size_t length = 0;
@@ -323,7 +323,7 @@ int s21_a_to_octali(const char **str, current_format *settings,
   if (negative) result *= -1;
   return result;
 }
-short int s21_a_to_octalsi(const char **str, current_format *settings,
+short int s21_a_to_octalsi(const char **str, scan_format *settings,
                            int *read_bytes_count, bool *is_scan_succeded) {
   short int result = 0;
   s21_size_t length = 0;
@@ -336,7 +336,7 @@ short int s21_a_to_octalsi(const char **str, current_format *settings,
   if (negative) result *= -1;
   return result;
 }
-long int s21_a_to_octall(const char **str, current_format *settings,
+long int s21_a_to_octall(const char **str, scan_format *settings,
                          int *read_bytes_count, bool *is_scan_succeded) {
   long int result = 0;
   s21_size_t length = 0;
@@ -350,7 +350,7 @@ long int s21_a_to_octall(const char **str, current_format *settings,
   return result;
 }
 
-bool get_uoctal(const char **str, current_format *settings, void *dest,
+bool get_uoctal(const char **str, scan_format *settings, void *dest,
                 int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -373,7 +373,7 @@ bool get_uoctal(const char **str, current_format *settings, void *dest,
 }
 
 void skip_hex_prefix(s21_size_t *length, const char **str,
-                     current_format *settings, int *read_bytes_count) {
+                     scan_format *settings, int *read_bytes_count) {
   if (s21_strlen(*str) >= 2 && (*str)[0] == '0' &&
       ((*str)[1] == 'x' || (*str)[1] == 'X')) {
     s21_size_t delta =
@@ -385,13 +385,13 @@ void skip_hex_prefix(s21_size_t *length, const char **str,
 }
 
 bool skip_hex_atoi_prefixes(s21_size_t *length, const char **str,
-                            current_format *settings, int *read_bytes_count) {
+                            scan_format *settings, int *read_bytes_count) {
   bool negative = is_negative_ato(length, str, read_bytes_count);
   skip_hex_prefix(length, str, settings, read_bytes_count);
   return negative;
 }
 
-int s21_a_to_hexi(const char **str, current_format *settings,
+int s21_a_to_hexi(const char **str, scan_format *settings,
                   int *read_bytes_count, bool *is_scan_succeded) {
   int result = 0;
   s21_size_t length = 0;
@@ -409,7 +409,7 @@ int s21_a_to_hexi(const char **str, current_format *settings,
   if (negative) result *= -1;
   return result;
 }
-short int s21_a_to_hexsi(const char **str, current_format *settings,
+short int s21_a_to_hexsi(const char **str, scan_format *settings,
                          int *read_bytes_count, bool *is_scan_succeded) {
   short int result = 0;
   s21_size_t length = 0;
@@ -427,7 +427,7 @@ short int s21_a_to_hexsi(const char **str, current_format *settings,
   if (negative) result *= -1;
   return result;
 }
-long int s21_a_to_hexl(const char **str, current_format *settings,
+long int s21_a_to_hexl(const char **str, scan_format *settings,
                        int *read_bytes_count, bool *is_scan_succeded) {
   long int result = 0;
   s21_size_t length = 0;
@@ -446,7 +446,7 @@ long int s21_a_to_hexl(const char **str, current_format *settings,
   return result;
 }
 
-bool get_uhex(const char **str, current_format *settings, void *dest,
+bool get_uhex(const char **str, scan_format *settings, void *dest,
               int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -482,7 +482,7 @@ bool get_uhex(const char **str, current_format *settings, void *dest,
   return is_scan_succeded;
 }
 
-bool get_integer(const char **str, current_format *settings, void *dest,
+bool get_integer(const char **str, scan_format *settings, void *dest,
                  int *read_bytes_count) {
   bool is_scan_succeded = false;
 
@@ -497,7 +497,7 @@ bool get_integer(const char **str, current_format *settings, void *dest,
   return is_scan_succeded;
 }
 
-bool get_string(const char **str, current_format *settings, void *dest,
+bool get_string(const char **str, scan_format *settings, void *dest,
                 int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -517,7 +517,7 @@ bool get_string(const char **str, current_format *settings, void *dest,
   return is_scan_succeded;
 }
 
-bool get_number(const char **str, current_format *settings, void *dest,
+bool get_number(const char **str, scan_format *settings, void *dest,
                 int *read_bytes_count) {
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
   if (settings->length_modifier == NONE) *(int *)dest = *read_bytes_count;
@@ -527,7 +527,7 @@ bool get_number(const char **str, current_format *settings, void *dest,
   return true;
 }
 
-bool get_pointer(const char **str, current_format *settings, void **dest,
+bool get_pointer(const char **str, scan_format *settings, void **dest,
                  int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -543,7 +543,7 @@ bool get_pointer(const char **str, current_format *settings, void **dest,
   return is_scan_succeded;
 }
 
-bool get_float(const char **str, current_format *settings, void *dest,
+bool get_float(const char **str, scan_format *settings, void *dest,
                int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->ignore_whitespaces) skip_whitespaces(str, read_bytes_count);
@@ -565,7 +565,7 @@ bool get_float(const char **str, current_format *settings, void *dest,
   return is_scan_succeded;
 }
 
-long double read_extended_double(const char **str, current_format *settings,
+long double read_extended_double(const char **str, scan_format *settings,
                                  int *read_bytes_count,
                                  bool *is_scan_succeded) {
   long double result = 0.0;
@@ -612,7 +612,7 @@ void goto_next_char(s21_size_t *length, const char **str,
   if (length) (*length)++;  // chars don't need width
 }
 
-bool get_input(const char **str, current_format *settings, void *dest,
+bool get_input(const char **str, scan_format *settings, void *dest,
                void **pointer_dest, int *read_bytes_count) {
   bool is_scan_succeded = false;
   if (settings->is_symbol)

@@ -6,7 +6,7 @@
 
 #include "s21_string.h"
 
-typedef enum MODIFIER {
+typedef enum PRINT_MODIFIER {
   ERR,
   CHAR,
   DECIMAL,
@@ -19,12 +19,11 @@ typedef enum MODIFIER {
   POINTER,
   NUMBER,
   PERCENT
-} MODIFIER;
+} PRINT_MODIFIER;
 
-typedef enum LENGTH { NONE, SHORT, LONG, EXTENDED_DOUBLE } LENGTH;
+typedef enum PRINT_LENGTH { NONE, SHORT, LONG, EXTENDED_DOUBLE } PRINT_LENGTH;
 
-// Структура current_format (имя оставлено, как в s21_sscanf)
-typedef struct current_format {
+typedef struct print_format {
   bool is_symbol;        // Если нет спецификатора - просто символ для вывода
   char matching_symbol;  // Если is_symbol==true, этот символ выводится
 
@@ -38,30 +37,30 @@ typedef struct current_format {
   bool precision_specified;
   s21_size_t precision;  // Значение точности
 
-  LENGTH length_modifier;  // Модификатор длины (h, l, L)
-  MODIFIER type_modifier;  // Тип спецификатора
+  PRINT_LENGTH length_modifier;  // Модификатор длины (h, l, L)
+  PRINT_MODIFIER type_modifier;  // Тип спецификатора
   char
       spec;  // Фактический символ спецификатора (например, 'f', 'e', 'g', etc.)
-} current_format;
+} print_format;
 
 int s21_sprintf(char *str, const char *format, ...);
-current_format *s21_sprintf_init_format();
-void s21_sprintf_fill_format_default(current_format *cf);
-void s21_sprintf_read_format(const char **format, current_format *cf,
+print_format *s21_sprintf_init_format();
+void s21_sprintf_fill_format_default(print_format *cf);
+void s21_sprintf_read_format(const char **format, print_format *cf,
                              va_list args);
 s21_size_t s21_sprintf_get_width(const char **format, va_list args);
 s21_size_t s21_sprintf_get_precision(const char **format, va_list args);
-void s21_sprintf_normalize_format(current_format *cf);
-void s21_sprintf_apply_format(char **dest, current_format *cf, va_list args,
+void s21_sprintf_normalize_format(print_format *cf);
+void s21_sprintf_apply_format(char **dest, print_format *cf, va_list args,
                               int *written);
 
 /* Прототипы вспомогательных функций форматирования */
 int s21_sprintf_format_char(va_list args, char *buffer);
-int s21_sprintf_format_string(current_format *cf, va_list args, char *buffer);
-int s21_sprintf_format_decimal(current_format *cf, va_list args, char *buffer);
-int s21_sprintf_format_unsigned(current_format *cf, va_list args, char *buffer,
+int s21_sprintf_format_string(print_format *cf, va_list args, char *buffer);
+int s21_sprintf_format_decimal(print_format *cf, va_list args, char *buffer);
+int s21_sprintf_format_unsigned(print_format *cf, va_list args, char *buffer,
                                 int base, bool uppercase);
-int s21_sprintf_format_float(current_format *cf, va_list args, char *buffer);
+int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer);
 int s21_sprintf_format_float_sci(double val, int prec, char *buffer,
                                  bool uppercase);
 int s21_sprintf_format_pointer(va_list args, char *buffer);
