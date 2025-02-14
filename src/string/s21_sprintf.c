@@ -365,26 +365,31 @@ int s21_sprintf_format_fractional_part(long double frac, int prec,
   return pos;
 }
 
-int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
-  long double val = (cf->length_modifier == EXTENDED_DOUBLE)
-                        ? va_arg(args, long double)
-                        : (long double)va_arg(args, double);
-  int prec = cf->precision_specified ? cf->precision : 6;
-  char orig_spec = cf->spec;
-
-  if (orig_spec == 'e' || orig_spec == 'E')
-    return s21_sprintf_format_float_sci(val, prec, buffer,
-                                        (orig_spec == 'E'));  // REFACTOR ME
-
-  if (orig_spec == 'g' || orig_spec == 'G') {
-    long double abs_val = fabsl(val);
-    int exponent = (abs_val > 0) ? (int)floorl(log10l(abs_val)) : 0;
-    if (exponent < -4 || exponent >= prec)
-      return s21_sprintf_format_float_sci(val, prec - 1, buffer,
-                                          (orig_spec == 'G'));  // REFACTOR ME
-    else
-      cf->spec = 'f';
+void remove_float_zeros(print_format *cf, char *buffer, int *pos) {
+  if (cf->spec == 'g' || cf->spec == 'G') {
+    int len = s21_strlen(buffer);
+    while (len > 0 && buffer[len - 1] == '0') len--;
+    if (len > 0 && buffer[len - 1] == '.') len--;
+    buffer[len] = '\0';
+    *pos = len;
   }
+}
+
+void s21_sprintf_format_prec(print_format *cf, char *buffer, int prec, int *pos,
+                             long double rounded, long long int_part) {
+  if (prec > 0 ||
+      (cf->alt_form && cf->precision_specified && cf->precision == 0)) {
+    buffer[(*pos)++] = '.';
+    if (prec > 0) {
+      long double frac = rounded - int_part;
+      *pos += s21_sprintf_format_fractional_part(frac, prec, buffer + *pos);
+    }
+  }
+  buffer[*pos] = '\0';
+}
+
+int s21_sprintf_format_default_float(print_format *cf, char *buffer,
+                                     long double val, int prec) {
   int pos = 0;
   long double abs_val = fabsl(val);
   long double mult = powl(10, prec);
@@ -397,24 +402,51 @@ int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
   pos += s21_sprintf_format_sign(cf, val, buffer);
   long long int_part = (long long)rounded;
   pos += s21_sprintf_itoa_custom(int_part, buffer + pos, 10, false);
-  if (prec > 0 ||
-      (cf->alt_form && cf->precision_specified && cf->precision == 0)) {
-    buffer[pos++] = '.';
-    if (prec > 0) {
-      long double frac = rounded - int_part;
-      pos += s21_sprintf_format_fractional_part(frac, prec, buffer + pos);
-    }
-  }
-  buffer[pos] = '\0';
-  // remove zeros and point
-  if (orig_spec == 'g' || orig_spec == 'G') {
-    int len = s21_strlen(buffer);
-    while (len > 0 && buffer[len - 1] == '0') len--;
-    if (len > 0 && buffer[len - 1] == '.') len--;
-    buffer[len] = '\0';
-    pos = len;
-  }
+  s21_sprintf_format_prec(cf, buffer, prec, &pos, rounded, int_part);
+  remove_float_zeros(cf, buffer, &pos);
   return pos;
+}
+
+int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
+  long double val = (cf->length_modifier == EXTENDED_DOUBLE)
+                        ? va_arg(args, long double)
+                        : (long double)va_arg(args, double);
+  int prec = cf->precision_specified ? cf->precision : 6;
+  int pos = 0;
+  if (cf->spec == 'e' || cf->spec == 'E')
+    pos = s21_sprintf_format_float_sci(val, prec, buffer, (cf->spec == 'E'));
+  else if (cf->spec == 'g' || cf->spec == 'G') {
+    long double abs_val = fabsl(val);
+    int exponent = (abs_val > 0) ? (int)floorl(log10l(abs_val)) : 0;
+    if (exponent < -4 || exponent >= prec)
+      pos = s21_sprintf_format_float_sci(val, prec - 1, buffer,
+                                         (cf->spec == 'G'));
+    else
+      pos = s21_sprintf_format_default_float(cf, buffer, val, prec);
+  } else
+    pos = s21_sprintf_format_default_float(cf, buffer, val, prec);
+  return pos;
+}
+
+long double s21_sprintf_float_norm(long double val, int *exponent) {
+  long double norm = val;
+  while (val != 0.0 && norm >= 10.0) {
+    norm /= 10.0;
+    (*exponent)++;
+  }
+  while (val != 0.0 && norm < 1.0) {
+    norm *= 10.0;
+    (*exponent)--;
+  }
+  return norm;
+}
+
+void s21_sprintf_format_exponent_part(char *buffer, int *exponent,
+                                      bool uppercase, int *pos) {
+  buffer[(*pos)++] = (uppercase ? 'E' : 'e');
+  buffer[(*pos)++] = (*exponent < 0) ? '-' : '+';
+  if (*exponent < 0) *exponent = -*exponent;
+  if (*exponent < 10) buffer[(*pos)++] = '0';
 }
 
 int s21_sprintf_format_float_sci(long double val, int prec, char *buffer,
@@ -425,15 +457,7 @@ int s21_sprintf_format_float_sci(long double val, int prec, char *buffer,
     val = -val;
   }
   int exponent = 0;
-  long double norm = val;
-  while (val != 0.0 && norm >= 10.0) {
-    norm /= 10.0;
-    exponent++;
-  }
-  while (val != 0.0 && norm < 1.0) {
-    norm *= 10.0;
-    exponent--;
-  }
+  long double norm = s21_sprintf_float_norm(val, &exponent);
   long double mult = powl(10, prec);
 
   long double rnorm = floorl(norm * mult + 0.5L) / mult;
@@ -448,11 +472,7 @@ int s21_sprintf_format_float_sci(long double val, int prec, char *buffer,
   }
   s21_memcpy(buffer + pos, frac_buf, frac_len);
   pos += frac_len;
-
-  buffer[pos++] = (uppercase ? 'E' : 'e');
-  buffer[pos++] = (exponent < 0) ? '-' : '+';
-  if (exponent < 0) exponent = -exponent;
-  if (exponent < 10) buffer[pos++] = '0';
+  s21_sprintf_format_exponent_part(buffer, &exponent, uppercase, &pos);
   pos += s21_sprintf_itoa_custom(exponent, buffer + pos, 10, false);
   buffer[pos] = '\0';
   return pos;
