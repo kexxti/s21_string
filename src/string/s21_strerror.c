@@ -1,8 +1,5 @@
 #include "s21_strerror.h"
 
-#include <stdio.h>           // REMOVE
-#define s21_sprintf sprintf  // REMOVE
-
 char *s21_strerror(int errnum) {
   static char buff[256];
   if (errnum >= 0 && errnum < (int)(sizeof(S21_ERRORS) / sizeof(S21_ERRORS[0])))

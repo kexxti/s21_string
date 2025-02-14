@@ -365,7 +365,7 @@ int s21_sprintf_format_fractional_part(long double frac, int prec,
   return pos;
 }
 
-void remove_float_zeros(print_format *cf, char *buffer, int *pos) {
+void s21_sprintf_remove_float_zeros(print_format *cf, char *buffer, int *pos) {
   if (cf->spec == 'g' || cf->spec == 'G') {
     int len = s21_strlen(buffer);
     while (len > 0 && buffer[len - 1] == '0') len--;
@@ -403,7 +403,7 @@ int s21_sprintf_format_default_float(print_format *cf, char *buffer,
   long long int_part = (long long)rounded;
   pos += s21_sprintf_itoa_custom(int_part, buffer + pos, 10, false);
   s21_sprintf_format_prec(cf, buffer, prec, &pos, rounded, int_part);
-  remove_float_zeros(cf, buffer, &pos);
+  s21_sprintf_remove_float_zeros(cf, buffer, &pos);
   return pos;
 }
 

@@ -69,7 +69,7 @@ int s21_sprintf_format_sign(print_format *cf, long double val, char *buffer);
 int s21_sprintf_format_fractional_part(long double frac, int prec,
                                        char *buffer);
 int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer);
-void remove_float_zeros(print_format *cf, char *buffer, int *pos);
+void s21_sprintf_remove_float_zeros(print_format *cf, char *buffer, int *pos);
 void s21_sprintf_format_prec(print_format *cf, char *buffer, int prec, int *pos,
                              long double rounded, long long int_part);
 void s21_sprintf_format_exponent_part(char *buffer, int *exponent,

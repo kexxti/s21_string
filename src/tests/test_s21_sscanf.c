@@ -11,139 +11,140 @@
 static int compare_formats(scan_format *format1, scan_format *format2);
 
 START_TEST(test_sscanf_get_length) {
-  SCAN_LENGTH res_none = get_scan_length('C');
+  SCAN_LENGTH res_none = s21_sscanf_get_length('C');
   ck_assert_uint_eq(res_none, NONE);
-  SCAN_LENGTH res_none_empty = get_scan_length('\0');
+  SCAN_LENGTH res_none_empty = s21_sscanf_get_length('\0');
   ck_assert_uint_eq(res_none_empty, NONE);
-  SCAN_LENGTH res_long = get_scan_length('l');
+  SCAN_LENGTH res_long = s21_sscanf_get_length('l');
   ck_assert_uint_eq(res_long, LONG);
-  SCAN_LENGTH res_short = get_scan_length('h');
+  SCAN_LENGTH res_short = s21_sscanf_get_length('h');
   ck_assert_uint_eq(res_short, SHORT);
-  SCAN_LENGTH res_none_upper = get_scan_length('H');
+  SCAN_LENGTH res_none_upper = s21_sscanf_get_length('H');
   ck_assert_uint_eq(res_none_upper, NONE);
-  SCAN_LENGTH res_ext = get_scan_length('L');
+  SCAN_LENGTH res_ext = s21_sscanf_get_length('L');
   ck_assert_uint_eq(res_ext, EXTENDED_DOUBLE);
 }
 END_TEST
 
 START_TEST(test_sscanf_get_modifier) {
-  SCAN_MODIFIER res_err = get_scan_modifier('C');
+  SCAN_MODIFIER res_err = s21_sscanf_get_modifier('C');
   ck_assert_uint_eq(res_err, ERR);
-  SCAN_MODIFIER res_err_empty = get_scan_modifier('\0');
+  SCAN_MODIFIER res_err_empty = s21_sscanf_get_modifier('\0');
   ck_assert_uint_eq(res_err_empty, ERR);
-  SCAN_MODIFIER res_char = get_scan_modifier('c');
+  SCAN_MODIFIER res_char = s21_sscanf_get_modifier('c');
   ck_assert_uint_eq(res_char, CHAR);
-  SCAN_MODIFIER res_decimal = get_scan_modifier('d');
+  SCAN_MODIFIER res_decimal = s21_sscanf_get_modifier('d');
   ck_assert_uint_eq(res_decimal, DECIMAL);
-  SCAN_MODIFIER res_integer = get_scan_modifier('i');
+  SCAN_MODIFIER res_integer = s21_sscanf_get_modifier('i');
   ck_assert_uint_eq(res_integer, INTEGER);
 
-  SCAN_MODIFIER res_float_e = get_scan_modifier('e');
+  SCAN_MODIFIER res_float_e = s21_sscanf_get_modifier('e');
   ck_assert_uint_eq(res_float_e, FLOAT);
-  SCAN_MODIFIER res_float_upper_e = get_scan_modifier('E');
+  SCAN_MODIFIER res_float_upper_e = s21_sscanf_get_modifier('E');
   ck_assert_uint_eq(res_float_upper_e, FLOAT);
-  SCAN_MODIFIER res_float_f = get_scan_modifier('f');
+  SCAN_MODIFIER res_float_f = s21_sscanf_get_modifier('f');
   ck_assert_uint_eq(res_float_f, FLOAT);
-  SCAN_MODIFIER res_float_g = get_scan_modifier('g');
+  SCAN_MODIFIER res_float_g = s21_sscanf_get_modifier('g');
   ck_assert_uint_eq(res_float_g, FLOAT);
-  SCAN_MODIFIER res_float_upper_g = get_scan_modifier('G');
+  SCAN_MODIFIER res_float_upper_g = s21_sscanf_get_modifier('G');
   ck_assert_uint_eq(res_float_upper_g, FLOAT);
 
-  SCAN_MODIFIER res_octal = get_scan_modifier('o');
+  SCAN_MODIFIER res_octal = s21_sscanf_get_modifier('o');
   ck_assert_uint_eq(res_octal, UOCTAL);
-  SCAN_MODIFIER res_string = get_scan_modifier('s');
+  SCAN_MODIFIER res_string = s21_sscanf_get_modifier('s');
   ck_assert_uint_eq(res_string, STRING);
-  SCAN_MODIFIER res_udecimal = get_scan_modifier('u');
+  SCAN_MODIFIER res_udecimal = s21_sscanf_get_modifier('u');
   ck_assert_uint_eq(res_udecimal, UDECIMAL);
 
-  SCAN_MODIFIER res_uhex = get_scan_modifier('x');
+  SCAN_MODIFIER res_uhex = s21_sscanf_get_modifier('x');
   ck_assert_uint_eq(res_uhex, UHEX);
-  SCAN_MODIFIER res_upper_uhex = get_scan_modifier('X');
+  SCAN_MODIFIER res_upper_uhex = s21_sscanf_get_modifier('X');
   ck_assert_uint_eq(res_upper_uhex, UHEX);
 
-  SCAN_MODIFIER res_pointer = get_scan_modifier('p');
+  SCAN_MODIFIER res_pointer = s21_sscanf_get_modifier('p');
   ck_assert_uint_eq(res_pointer, POINTER);
-  SCAN_MODIFIER res_number = get_scan_modifier('n');
+  SCAN_MODIFIER res_number = s21_sscanf_get_modifier('n');
   ck_assert_uint_eq(res_number, NUMBER);
-  SCAN_MODIFIER res_percent = get_scan_modifier('%');
+  SCAN_MODIFIER res_percent = s21_sscanf_get_modifier('%');
   ck_assert_uint_eq(res_percent, PERCENT);
 }
 END_TEST
 
 START_TEST(test_sscanf_get_width) {
   const char *string_empty = "\0";
-  s21_size_t res_empty = get_scan_width(&string_empty);
+  s21_size_t res_empty = s21_sscanf_get_width(&string_empty);
   ck_assert_uint_eq(res_empty, 0);
   ck_assert_str_eq(string_empty, "\0");
 
   const char *string_none = "Ld";
-  s21_size_t res_none = get_scan_width(&string_none);
+  s21_size_t res_none = s21_sscanf_get_width(&string_none);
   ck_assert_uint_eq(res_none, 0);
   ck_assert_str_eq(string_none, "Ld");
 
   const char *string_zero = "0";
-  s21_size_t res_zero = get_scan_width(&string_zero);
+  s21_size_t res_zero = s21_sscanf_get_width(&string_zero);
   ck_assert_uint_eq(res_zero, 0);
   ck_assert_str_eq(string_zero, "\0");
 
   const char *string_zero_plus = "0u";
-  s21_size_t res_zero_plus = get_scan_width(&string_zero_plus);
+  s21_size_t res_zero_plus = s21_sscanf_get_width(&string_zero_plus);
   ck_assert_uint_eq(res_zero_plus, 0);
   ck_assert_str_eq(string_zero_plus, "u");
 
   const char *string_single_digit = "5i";
-  s21_size_t res_single_digit = get_scan_width(&string_single_digit);
+  s21_size_t res_single_digit = s21_sscanf_get_width(&string_single_digit);
   ck_assert_uint_eq(res_single_digit, 5);
   ck_assert_str_eq(string_single_digit, "i");
 
   const char *string_leading_zero = "07u";
-  s21_size_t res_leading_zero = get_scan_width(&string_leading_zero);
+  s21_size_t res_leading_zero = s21_sscanf_get_width(&string_leading_zero);
   ck_assert_uint_eq(res_leading_zero, 7);
   ck_assert_str_eq(string_leading_zero, "u");
 
   const char *string_two_digits = "15f";
-  s21_size_t res_two_digits = get_scan_width(&string_two_digits);
+  s21_size_t res_two_digits = s21_sscanf_get_width(&string_two_digits);
   ck_assert_uint_eq(res_two_digits, 15);
   ck_assert_str_eq(string_two_digits, "f");
 
   const char *string_two_digit_leading_zeros = "0015f";
   s21_size_t res_two_digit_leading_zeros =
-      get_scan_width(&string_two_digit_leading_zeros);
+      s21_sscanf_get_width(&string_two_digit_leading_zeros);
   ck_assert_uint_eq(res_two_digit_leading_zeros, 15);
   ck_assert_str_eq(string_two_digit_leading_zeros, "f");
 
   const char *string_three_digits = "683s";
-  s21_size_t res_three_digits = get_scan_width(&string_three_digits);
+  s21_size_t res_three_digits = s21_sscanf_get_width(&string_three_digits);
   ck_assert_uint_eq(res_three_digits, 683);
   ck_assert_str_eq(string_three_digits, "s");
 
   const char *string_zero_additional = "0s %f g";
-  s21_size_t res_zero_additional = get_scan_width(&string_zero_additional);
+  s21_size_t res_zero_additional =
+      s21_sscanf_get_width(&string_zero_additional);
   ck_assert_uint_eq(res_zero_additional, 0);
   ck_assert_str_eq(string_zero_additional, "s %f g");
 
   const char *string_additional = "5s %7f 9g";
-  s21_size_t res_additional = get_scan_width(&string_additional);
+  s21_size_t res_additional = s21_sscanf_get_width(&string_additional);
   ck_assert_uint_eq(res_additional, 5);
   ck_assert_str_eq(string_additional, "s %7f 9g");
 }
 END_TEST
 
 START_TEST(test_sscanf_formats) {
-  scan_format *f1 = init_scan_format();
-  scan_format *f2 = init_scan_format();
+  scan_format *f1 = s21_sscanf_init_format();
+  scan_format *f2 = s21_sscanf_init_format();
   const char *format = "%5s   %7f 9g  %*X%*9ld.o %%\n f";
 
-  read_scan_format(&format, f1);
+  s21_sscanf_read_format(&format, f1);
   f2->width = 5;
   f2->type_modifier = STRING;
   int res = compare_formats(f1, f2);
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, "   %7f 9g  %*X%*9ld.o %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->ignore_whitespaces = true;
   f2->width = 7;
   f2->type_modifier = FLOAT;
@@ -151,9 +152,9 @@ START_TEST(test_sscanf_formats) {
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, " 9g  %*X%*9ld.o %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->ignore_whitespaces = true;
   f2->is_symbol = true;
   f2->matching_symbol = '9';
@@ -161,18 +162,18 @@ START_TEST(test_sscanf_formats) {
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, "g  %*X%*9ld.o %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->is_symbol = true;
   f2->matching_symbol = 'g';
   res = compare_formats(f1, f2);
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, "  %*X%*9ld.o %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->ignore_whitespaces = true;
   f2->ignore = true;
   f2->type_modifier = UHEX;
@@ -180,9 +181,9 @@ START_TEST(test_sscanf_formats) {
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, "%*9ld.o %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->ignore = true;
   f2->width = 9;
   f2->length_modifier = LONG;
@@ -191,36 +192,36 @@ START_TEST(test_sscanf_formats) {
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, ".o %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->is_symbol = true;
   f2->matching_symbol = '.';
   res = compare_formats(f1, f2);
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, "o %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->is_symbol = true;
   f2->matching_symbol = 'o';
   res = compare_formats(f1, f2);
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, " %%\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->ignore_whitespaces = true;
   f2->type_modifier = PERCENT;
   res = compare_formats(f1, f2);
   ck_assert_uint_eq(res, 0);
   ck_assert_str_eq(format, "\n f");
 
-  fill_scan_format_default(f1);
-  fill_scan_format_default(f2);
-  read_scan_format(&format, f1);
+  s21_sscanf_fill_format_default(f1);
+  s21_sscanf_fill_format_default(f2);
+  s21_sscanf_read_format(&format, f1);
   f2->ignore_whitespaces = true;
   f2->is_symbol = true;
   f2->matching_symbol = 'f';
