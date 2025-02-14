@@ -5,48 +5,36 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-// Главная функция s21_sprintf
 int s21_sprintf(char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);
   int written = 0;
   char *dest = str;
+  print_format *cf = s21_sprintf_init_format();  // mem alloc is expensive
   while (*format) {
-    if (*format != '%') {
-      *dest++ = *format++;
-      written++;
-    } else {
-      format++;  // пропускаем '%'
-      if (*format == '%') {
-        *dest++ = '%';
-        written++;
-        format++;
-        continue;
-      }
-      print_format *cf = s21_sprintf_init_format();
-      s21_sprintf_fill_format_default(cf);
-      s21_sprintf_read_format(&format, cf, args);
-      s21_sprintf_normalize_format(cf);
-      s21_sprintf_apply_format(&dest, cf, args, &written);
-      free(cf);
-    }
+    s21_sprintf_fill_format_default(cf);
+    s21_sprintf_read_format(&format, cf, args);
+    s21_sprintf_apply_format(&dest, cf, args, &written);
   }
+  free(cf);
   *dest = '\0';
   va_end(args);
   return written;
 }
 
-// Выделение памяти для print_format
+void s21_sprintf_write_symbol(const char ch, char **dest, int *written) {
+  **dest = ch;
+  (*dest)++;
+  (*written)++;
+}
+
 print_format *s21_sprintf_init_format() {
   print_format *cf = (print_format *)malloc(sizeof(print_format));
   if (cf) s21_sprintf_fill_format_default(cf);
   return cf;
 }
 
-// Инициализация значений по умолчанию
 void s21_sprintf_fill_format_default(print_format *cf) {
-  cf->is_symbol = false;
-  cf->matching_symbol = '\0';
   cf->left_align = false;
   cf->force_sign = false;
   cf->space = false;
@@ -56,94 +44,92 @@ void s21_sprintf_fill_format_default(print_format *cf) {
   cf->precision_specified = false;
   cf->precision = 0;
   cf->length_modifier = NONE;
-  cf->type_modifier = ERR;
+  cf->type_modifier = SYMBOL;
   cf->spec = '\0';
 }
 
-// Разбор спецификатора формата
-void s21_sprintf_read_format(const char **format, print_format *cf,
-                             va_list args) {
-  s21_sprintf_parse_flags(format, cf);
-  cf->width = s21_sprintf_get_width(format, args);
+void s21_sprintf_read_precision(const char **format, print_format *cf,
+                                va_list args) {
   if (**format == '.') {
     (*format)++;
     cf->precision_specified = true;
     cf->precision = s21_sprintf_get_precision(format, args);
   }
+}
+
+void s21_sprintf_read_length(const char **format, print_format *cf) {
   if (**format == 'h' || **format == 'l' || **format == 'L') {
     cf->length_modifier =
         (**format == 'h' ? SHORT : (**format == 'l' ? LONG : EXTENDED_DOUBLE));
     (*format)++;
   }
-  cf->spec = **format;
-  switch (cf->spec) {
-    case 'c':
-      cf->type_modifier = CHAR;
-      break;
-    case 's':
-      cf->type_modifier = STRING;
-      break;
-    case 'd':
-    case 'i':
-      cf->type_modifier = DECIMAL;
-      break;
-    case 'u':
-      cf->type_modifier = UDECIMAL;
-      break;
-    case 'o':
-      cf->type_modifier = UOCTAL;
-      break;
-    case 'x':
-    case 'X':
-      cf->type_modifier = UHEX;
-      break;
-    case 'p':
-      cf->type_modifier = POINTER;
-      break;
-    case 'n':
-      cf->type_modifier = NUMBER;
-      break;
-    case 'f':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-      cf->type_modifier = FLOAT;
-      break;
-    default:
-      cf->type_modifier = ERR;
-      break;
+}
+
+void s21_sprintf_pick_format(print_format *cf) {
+  if (cf->spec == 'c') {
+    cf->type_modifier = CHAR;
+  } else if (cf->spec == 's') {
+    cf->type_modifier = STRING;
+  } else if (cf->spec == 'd' || cf->spec == 'i') {
+    cf->type_modifier = DECIMAL;
+  } else if (cf->spec == 'u') {
+    cf->type_modifier = UDECIMAL;
+  } else if (cf->spec == 'o') {
+    cf->type_modifier = UOCTAL;
+  } else if (cf->spec == 'x' || cf->spec == 'X') {
+    cf->type_modifier = UHEX;
+  } else if (cf->spec == 'p') {
+    cf->type_modifier = POINTER;
+  } else if (cf->spec == 'n') {
+    cf->type_modifier = NUMBER;
+  } else if (cf->spec == 'f' || cf->spec == 'e' || cf->spec == 'E' ||
+             cf->spec == 'g' || cf->spec == 'G') {
+    cf->type_modifier = FLOAT;
+  } else if (cf->spec == '%') {
+    cf->type_modifier = PERCENT;
+  } else {
+    cf->type_modifier = SYMBOL;
+  }
+}
+
+void s21_sprintf_read_format(const char **format, print_format *cf,
+                             va_list args) {
+  if (**format == '%') {
+    (*format)++;  // skip initial '%'
+    s21_sprintf_parse_flags(format, cf);
+    cf->width = s21_sprintf_get_width(format, args);
+    s21_sprintf_read_precision(format, cf, args);
+    s21_sprintf_read_length(format, cf);
+    cf->spec = **format;
+    s21_sprintf_pick_format(cf);
+  } else {
+    cf->spec = **format;
+    cf->type_modifier = SYMBOL;
   }
   if (**format) (*format)++;
 }
 
-// Вспомогательная функция для разбора флагов
+bool is_additional_format(char c) {
+  return c == '-' || c == '+' || c == ' ' || c == '#' || c == '0';
+}
+
 void s21_sprintf_parse_flags(const char **format, print_format *cf) {
-  while (**format) {
-    switch (**format) {
-      case '-':
-        cf->left_align = true;
-        break;
-      case '+':
-        cf->force_sign = true;
-        break;
-      case ' ':
-        cf->space = true;
-        break;
-      case '#':
-        cf->alt_form = true;
-        break;
-      case '0':
-        cf->zero_pad = true;
-        break;
-      default:
-        return;
-    }
+  char ch;
+  while ((ch = **format) && is_additional_format(ch)) {
+    if (ch == '-')
+      cf->left_align = true;
+    else if (ch == '+')
+      cf->force_sign = true;
+    else if (ch == ' ')
+      cf->space = true;
+    else if (ch == '#')
+      cf->alt_form = true;
+    else if (ch == '0')
+      cf->zero_pad = true;
     (*format)++;
   }
 }
 
-// Получение ширины поля
 s21_size_t s21_sprintf_get_width(const char **format, va_list args) {
   s21_size_t width = 0;
   if (**format == '*') {
@@ -158,7 +144,6 @@ s21_size_t s21_sprintf_get_width(const char **format, va_list args) {
   return width;
 }
 
-// Получение точности
 s21_size_t s21_sprintf_get_precision(const char **format, va_list args) {
   s21_size_t precision = 0;
   if (**format == '*') {
@@ -173,15 +158,6 @@ s21_size_t s21_sprintf_get_precision(const char **format, va_list args) {
   return precision;
 }
 
-// Приведение формата к корректному виду для спецификатора '%'
-void s21_sprintf_normalize_format(print_format *cf) {
-  if (cf->type_modifier == PERCENT) {
-    cf->is_symbol = true;
-    cf->matching_symbol = '%';
-  }
-}
-
-// Вспомогательная функция для разворота строки
 void s21_sprintf_reverse_str(char *str, int len) {
   int i = 0, j = len - 1;
   while (i < j) {
@@ -193,7 +169,6 @@ void s21_sprintf_reverse_str(char *str, int len) {
   }
 }
 
-// Преобразование знакового целого в строку
 int s21_sprintf_itoa_custom(long long num, char *buf, int base,
                             bool uppercase) {
   int i = 0;
@@ -206,9 +181,9 @@ int s21_sprintf_itoa_custom(long long num, char *buf, int base,
     buf[i++] = '0';
   } else {
     while (num) {
-      int rem = num % base;  // Остаток
-      buf[i++] =
-          (rem < 10) ? ('0' + rem) : ((uppercase ? 'A' : 'a') + rem - 10);
+      int remain = num % base;
+      buf[i++] = (remain < 10) ? ('0' + remain)
+                               : ((uppercase ? 'A' : 'a') + remain - 10);
       num /= base;
     }
     if (neg) buf[i++] = '-';
@@ -218,7 +193,6 @@ int s21_sprintf_itoa_custom(long long num, char *buf, int base,
   return i;
 }
 
-// Преобразование беззнакового целого в строку
 int s21_sprintf_utoa_custom(unsigned long long num, char *buf, int base,
                             bool uppercase) {
   int i = 0;
@@ -226,9 +200,9 @@ int s21_sprintf_utoa_custom(unsigned long long num, char *buf, int base,
     buf[i++] = '0';
   } else {
     while (num) {
-      int rem = num % base;  // Остаток
-      buf[i++] =
-          (rem < 10) ? ('0' + rem) : ((uppercase ? 'A' : 'a') + rem - 10);
+      int remain = num % base;
+      buf[i++] = (remain < 10) ? ('0' + remain)
+                               : ((uppercase ? 'A' : 'a') + remain - 10);
       num /= base;
     }
   }
@@ -237,66 +211,52 @@ int s21_sprintf_utoa_custom(unsigned long long num, char *buf, int base,
   return i;
 }
 
-// Функция форматирования: выбирает нужный обработчик, вычисляет padding и
-// записывает результат
-void s21_sprintf_apply_format(char **dest, print_format *cf, va_list args,
-                              int *written) {
-  char temp[1024] = {0};
+int s21_sprintf_format(print_format *cf, va_list args, char *temp,
+                       int written) {
   int len = 0;
-  switch (cf->type_modifier) {
-    case CHAR:
-      len = s21_sprintf_format_char(args, temp);
-      break;
-    case STRING:
-      len = s21_sprintf_format_string(cf, args, temp);
-      break;
-    case DECIMAL:
-    case INTEGER:
-      len = s21_sprintf_format_decimal(cf, args, temp);
-      break;
-    case UDECIMAL:
-      len = s21_sprintf_format_unsigned(cf, args, temp, 10, false);
-      break;
-    case UOCTAL:
-      len = s21_sprintf_format_unsigned(cf, args, temp, 8, false);
-      break;
-    case UHEX:
-      bool up = (cf->spec == 'X');
-      len = s21_sprintf_format_unsigned(cf, args, temp, 16, up);
-      break;
-    case POINTER:
-      len = s21_sprintf_format_pointer(args, temp);
-      break;
-    case FLOAT:
-      len = s21_sprintf_format_float(cf, args, temp);
-      break;
-    case NUMBER:
-      int *n_ptr = va_arg(args, int *);
-      if (n_ptr) *n_ptr = *written;
-      return;
-    case PERCENT:
-      temp[0] = '%';
-      temp[1] = '\0';
-      len = 1;
-      break;
-    default:
-      temp[0] = cf->spec;
-      temp[1] = '\0';
-      len = 1;
-      break;
+  if (cf->type_modifier == CHAR) {
+    len = s21_sprintf_format_char(args, temp);
+  } else if (cf->type_modifier == STRING) {
+    len = s21_sprintf_format_string(cf, args, temp);
+  } else if (cf->type_modifier == DECIMAL || cf->type_modifier == INTEGER) {
+    len = s21_sprintf_format_decimal(cf, args, temp);
+  } else if (cf->type_modifier == UDECIMAL) {
+    len = s21_sprintf_format_unsigned(cf, args, temp, 10, false);
+  } else if (cf->type_modifier == UOCTAL) {
+    len = s21_sprintf_format_unsigned(cf, args, temp, 8, false);
+  } else if (cf->type_modifier == UHEX) {
+    bool up = (cf->spec == 'X');
+    len = s21_sprintf_format_unsigned(cf, args, temp, 16, up);
+  } else if (cf->type_modifier == POINTER) {
+    len = s21_sprintf_format_pointer(args, temp);
+  } else if (cf->type_modifier == FLOAT) {
+    len = s21_sprintf_format_float(cf, args, temp);
+  } else if (cf->type_modifier == NUMBER) {
+    int *n_ptr = va_arg(args, int *);
+    if (n_ptr) *n_ptr = written;
   }
-  int pad = (cf->width > (s21_size_t)len) ? cf->width - len : 0;
-  if (!cf->left_align)
-    s21_sprintf_write_padding(
-        dest, pad, (cf->zero_pad && !cf->precision_specified) ? '0' : ' ',
-        written);
-  s21_memcpy(*dest, temp, len);
-  *dest += len;
-  *written += len;
-  if (cf->left_align) s21_sprintf_write_padding(dest, pad, ' ', written);
+  return len;
 }
 
-// Форматирование символа (%c)
+void s21_sprintf_apply_format(char **dest, print_format *cf, va_list args,
+                              int *written) {
+  if (cf->type_modifier == SYMBOL || cf->type_modifier == PERCENT) {
+    s21_sprintf_write_symbol(cf->spec, dest, written);
+  } else {
+    char temp[1024] = {0};
+    int len = s21_sprintf_format(cf, args, temp, *written);
+    int padding = (cf->width > (s21_size_t)len) ? cf->width - len : 0;
+    if (!cf->left_align)
+      s21_sprintf_write_padding(
+          dest, padding, (cf->zero_pad && !cf->precision_specified) ? '0' : ' ',
+          written);
+    s21_memcpy(*dest, temp, len);
+    *dest += len;
+    *written += len;
+    if (cf->left_align) s21_sprintf_write_padding(dest, padding, ' ', written);
+  }
+}
+
 int s21_sprintf_format_char(va_list args, char *buffer) {
   char ch = (char)va_arg(args, int);
   buffer[0] = ch;
@@ -304,7 +264,6 @@ int s21_sprintf_format_char(va_list args, char *buffer) {
   return 1;
 }
 
-// Форматирование строки (%s)
 int s21_sprintf_format_string(print_format *cf, va_list args, char *buffer) {
   char *s = va_arg(args, char *);
   if (!s) s = "(null)";
@@ -317,10 +276,15 @@ int s21_sprintf_format_string(print_format *cf, va_list args, char *buffer) {
   return i;
 }
 
-// Форматирование знакового целого (%d/%i)
 int s21_sprintf_format_decimal(print_format *cf, va_list args, char *buffer) {
   int is_negative = 0;
-  long long num = va_arg(args, int);
+  long long num;
+  if (cf->length_modifier == LONG)
+    num = va_arg(args, long int);
+  else if (cf->length_modifier == SHORT)
+    num = va_arg(args, int);  // short int == int when used with va_arg
+  else
+    num = va_arg(args, int);
   if (num < 0) {
     is_negative = 1;
     num = -num;
@@ -347,7 +311,6 @@ int s21_sprintf_format_decimal(print_format *cf, va_list args, char *buffer) {
   return pos;
 }
 
-// Форматирование беззнакового целого (%u, %o, %x/%X)
 int s21_sprintf_format_unsigned(print_format *cf, va_list args, char *buffer,
                                 int base, bool uppercase) {
   unsigned long long num;
@@ -358,7 +321,7 @@ int s21_sprintf_format_unsigned(print_format *cf, va_list args, char *buffer,
   else
     num = va_arg(args, unsigned int);
   int len = s21_sprintf_utoa_custom(num, buffer, base, uppercase);
-  // Обработка альтернативной формы для восьмеричных и шестнадцатеричных чисел
+  // oct and hex
   if (cf->alt_form) {
     if (base == 8 && buffer[0] != '0') {
       for (int i = len; i >= 0; i--) buffer[i + 1] = buffer[i];
@@ -374,8 +337,6 @@ int s21_sprintf_format_unsigned(print_format *cf, va_list args, char *buffer,
   return len;
 }
 
-// Вспомогательная функция для форматирования знака
-// Возвращает количество записанных символов (0 или 1)
 int s21_sprintf_format_sign(print_format *cf, long double val, char *buffer) {
   int pos = 0;
   if (val < 0)
@@ -387,9 +348,6 @@ int s21_sprintf_format_sign(print_format *cf, long double val, char *buffer) {
   return pos;
 }
 
-// Вспомогательная функция для форматирования дробной части
-// Умножает дробь на 10^prec, округляет результат и форматирует его с ведущими
-// нулями
 int s21_sprintf_format_fractional_part(long double frac, int prec,
                                        char *buffer) {
   int pos = 0;
@@ -397,7 +355,7 @@ int s21_sprintf_format_fractional_part(long double frac, int prec,
   long long frac_int = (long long)roundl(frac * mult);
   char frac_buf[64] = {0};
   int frac_len = s21_sprintf_utoa_custom(frac_int, frac_buf, 10, false);
-  // Добавляем ведущие нули, если цифр меньше 'prec'
+  // leading zeros if needed
   while (frac_len < prec) {
     buffer[pos++] = '0';
     prec--;
@@ -407,23 +365,23 @@ int s21_sprintf_format_fractional_part(long double frac, int prec,
   return pos;
 }
 
-// Форматирование чисел с плавающей точкой - стандартное представление (%f)
 int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
   long double val = (cf->length_modifier == EXTENDED_DOUBLE)
                         ? va_arg(args, long double)
                         : (long double)va_arg(args, double);
   int prec = cf->precision_specified ? cf->precision : 6;
   char orig_spec = cf->spec;
-  // Если экспоненциальный формат, сразу форматируем в научной нотации
+
   if (orig_spec == 'e' || orig_spec == 'E')
-    return s21_sprintf_format_float_sci(val, prec, buffer, (orig_spec == 'E'));
-  // Для общего формата %g/%G выбираем между фиксированным и экспоненциальным
+    return s21_sprintf_format_float_sci(val, prec, buffer,
+                                        (orig_spec == 'E'));  // REFACTOR ME
+
   if (orig_spec == 'g' || orig_spec == 'G') {
     long double abs_val = fabsl(val);
     int exponent = (abs_val > 0) ? (int)floorl(log10l(abs_val)) : 0;
     if (exponent < -4 || exponent >= prec)
       return s21_sprintf_format_float_sci(val, prec - 1, buffer,
-                                          (orig_spec == 'G'));
+                                          (orig_spec == 'G'));  // REFACTOR ME
     else
       cf->spec = 'f';
   }
@@ -431,11 +389,11 @@ int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
   long double abs_val = fabsl(val);
   long double mult = powl(10, prec);
   long double rounded = floorl(abs_val * mult + 0.5L) / mult;
-  // Если cf->precision_specified && cf->precision==1 и дробная часть равна 0,
-  // считаем, что prec = 0
+
   if (cf->precision_specified && cf->precision == 1 &&
       ((long long)roundl((rounded - (long long)rounded) * mult)) == 0)
     prec = 0;
+
   pos += s21_sprintf_format_sign(cf, val, buffer);
   long long int_part = (long long)rounded;
   pos += s21_sprintf_itoa_custom(int_part, buffer + pos, 10, false);
@@ -448,7 +406,7 @@ int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
     }
   }
   buffer[pos] = '\0';
-  // Если оригинальный спецификатор %g/%G, удаляем незначащие нули и точку
+  // remove zeros and point
   if (orig_spec == 'g' || orig_spec == 'G') {
     int len = s21_strlen(buffer);
     while (len > 0 && buffer[len - 1] == '0') len--;
@@ -459,7 +417,6 @@ int s21_sprintf_format_float(print_format *cf, va_list args, char *buffer) {
   return pos;
 }
 
-// Форматирование чисел с плавающей точкой в научной нотации (%e/%E/%g/%G)
 int s21_sprintf_format_float_sci(long double val, int prec, char *buffer,
                                  bool uppercase) {
   int pos = 0;
@@ -478,7 +435,7 @@ int s21_sprintf_format_float_sci(long double val, int prec, char *buffer,
     exponent--;
   }
   long double mult = powl(10, prec);
-  // Округленное нормальное значение
+
   long double rnorm = floorl(norm * mult + 0.5L) / mult;
   pos += s21_sprintf_itoa_custom((long long)rnorm, buffer + pos, 10, false);
   buffer[pos++] = '.';
@@ -491,7 +448,7 @@ int s21_sprintf_format_float_sci(long double val, int prec, char *buffer,
   }
   s21_memcpy(buffer + pos, frac_buf, frac_len);
   pos += frac_len;
-  // Формируем экспоненту
+
   buffer[pos++] = (uppercase ? 'E' : 'e');
   buffer[pos++] = (exponent < 0) ? '-' : '+';
   if (exponent < 0) exponent = -exponent;
@@ -501,7 +458,6 @@ int s21_sprintf_format_float_sci(long double val, int prec, char *buffer,
   return pos;
 }
 
-// Форматирование указателя (%p)
 int s21_sprintf_format_pointer(va_list args, char *buffer) {
   void *ptr = va_arg(args, void *);
   unsigned long long addr = (unsigned long long)ptr;
@@ -512,10 +468,9 @@ int s21_sprintf_format_pointer(va_list args, char *buffer) {
   return pos;
 }
 
-// Запись отступов (padding)
-void s21_sprintf_write_padding(char **dest, int pad, char pad_char,
+void s21_sprintf_write_padding(char **dest, int padding, char pad_char,
                                int *written) {
-  for (int i = 0; i < pad; i++) {
+  for (int i = 0; i < padding; i++) {
     **dest = pad_char;
     (*dest)++;
     (*written)++;
