@@ -1,7 +1,5 @@
 #include "test_s21_strerror.h"
 
-#include <string.h>
-
 #include "../string/s21_strerror.h"
 #include "../string/s21_string.h"
 

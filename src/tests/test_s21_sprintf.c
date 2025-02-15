@@ -1,10 +1,6 @@
 #include "test_s21_sprintf.h"
 
-#include <check.h>
-#include <math.h>
-#include <stdio.h>
-
-#include "../string/s21_sprintf.h"
+#include "../string/s21_string.h"
 
 START_TEST(test_sprintf_basic_integers) {
   char buf1[256], buf2[256];

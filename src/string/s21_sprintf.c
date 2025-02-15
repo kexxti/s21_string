@@ -1,10 +1,5 @@
 #include "s21_sprintf.h"
 
-#include <ctype.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stdlib.h>
-
 int s21_sprintf(char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);

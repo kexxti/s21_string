@@ -1,27 +1,14 @@
 #ifndef S21_SPRINTF_H
 #define S21_SPRINTF_H
 
+#include <ctype.h>
+#include <math.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
+#include "s21_formatting.h"
 #include "s21_string.h"
-
-typedef enum PRINT_MODIFIER {
-  SYMBOL,
-  CHAR,
-  DECIMAL,
-  INTEGER,
-  FLOAT,
-  UOCTAL,
-  STRING,
-  UDECIMAL,
-  UHEX,
-  POINTER,
-  NUMBER,
-  PERCENT
-} PRINT_MODIFIER;
-
-typedef enum PRINT_LENGTH { NONE, SHORT, LONG, EXTENDED_DOUBLE } PRINT_LENGTH;
 
 typedef struct print_format {
   bool left_align;  // '-'
@@ -34,12 +21,11 @@ typedef struct print_format {
   bool precision_specified;  // dot
   s21_size_t precision;
 
-  PRINT_LENGTH length_modifier;
-  PRINT_MODIFIER type_modifier;
+  LENGTH length_modifier;
+  MODIFIER type_modifier;
   char spec;  // 'f', 'e', etc
 } print_format;
 
-int s21_sprintf(char *str, const char *format, ...);
 print_format *s21_sprintf_init_format();
 void s21_sprintf_fill_format_default(print_format *cf);
 void s21_sprintf_read_format(const char **format, print_format *cf,

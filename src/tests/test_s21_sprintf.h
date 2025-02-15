@@ -2,6 +2,7 @@
 #define TEST_S21_SPRINTF_H
 
 #include <check.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

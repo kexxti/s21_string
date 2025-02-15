@@ -1,8 +1,5 @@
 #include "test_s21_sscanf.h"
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "../string/s21_sscanf.h"
 #include "../string/s21_string.h"
 
@@ -11,61 +8,61 @@
 static int compare_formats(scan_format *format1, scan_format *format2);
 
 START_TEST(test_sscanf_get_length) {
-  SCAN_LENGTH res_none = s21_sscanf_get_length('C');
+  LENGTH res_none = s21_sscanf_get_length('C');
   ck_assert_uint_eq(res_none, NONE);
-  SCAN_LENGTH res_none_empty = s21_sscanf_get_length('\0');
+  LENGTH res_none_empty = s21_sscanf_get_length('\0');
   ck_assert_uint_eq(res_none_empty, NONE);
-  SCAN_LENGTH res_long = s21_sscanf_get_length('l');
+  LENGTH res_long = s21_sscanf_get_length('l');
   ck_assert_uint_eq(res_long, LONG);
-  SCAN_LENGTH res_short = s21_sscanf_get_length('h');
+  LENGTH res_short = s21_sscanf_get_length('h');
   ck_assert_uint_eq(res_short, SHORT);
-  SCAN_LENGTH res_none_upper = s21_sscanf_get_length('H');
+  LENGTH res_none_upper = s21_sscanf_get_length('H');
   ck_assert_uint_eq(res_none_upper, NONE);
-  SCAN_LENGTH res_ext = s21_sscanf_get_length('L');
+  LENGTH res_ext = s21_sscanf_get_length('L');
   ck_assert_uint_eq(res_ext, EXTENDED_DOUBLE);
 }
 END_TEST
 
 START_TEST(test_sscanf_get_modifier) {
-  SCAN_MODIFIER res_err = s21_sscanf_get_modifier('C');
-  ck_assert_uint_eq(res_err, ERR);
-  SCAN_MODIFIER res_err_empty = s21_sscanf_get_modifier('\0');
-  ck_assert_uint_eq(res_err_empty, ERR);
-  SCAN_MODIFIER res_char = s21_sscanf_get_modifier('c');
+  MODIFIER res_err = s21_sscanf_get_modifier('C');
+  ck_assert_uint_eq(res_err, SYMBOL);
+  MODIFIER res_err_empty = s21_sscanf_get_modifier('\0');
+  ck_assert_uint_eq(res_err_empty, SYMBOL);
+  MODIFIER res_char = s21_sscanf_get_modifier('c');
   ck_assert_uint_eq(res_char, CHAR);
-  SCAN_MODIFIER res_decimal = s21_sscanf_get_modifier('d');
+  MODIFIER res_decimal = s21_sscanf_get_modifier('d');
   ck_assert_uint_eq(res_decimal, DECIMAL);
-  SCAN_MODIFIER res_integer = s21_sscanf_get_modifier('i');
+  MODIFIER res_integer = s21_sscanf_get_modifier('i');
   ck_assert_uint_eq(res_integer, INTEGER);
 
-  SCAN_MODIFIER res_float_e = s21_sscanf_get_modifier('e');
+  MODIFIER res_float_e = s21_sscanf_get_modifier('e');
   ck_assert_uint_eq(res_float_e, FLOAT);
-  SCAN_MODIFIER res_float_upper_e = s21_sscanf_get_modifier('E');
+  MODIFIER res_float_upper_e = s21_sscanf_get_modifier('E');
   ck_assert_uint_eq(res_float_upper_e, FLOAT);
-  SCAN_MODIFIER res_float_f = s21_sscanf_get_modifier('f');
+  MODIFIER res_float_f = s21_sscanf_get_modifier('f');
   ck_assert_uint_eq(res_float_f, FLOAT);
-  SCAN_MODIFIER res_float_g = s21_sscanf_get_modifier('g');
+  MODIFIER res_float_g = s21_sscanf_get_modifier('g');
   ck_assert_uint_eq(res_float_g, FLOAT);
-  SCAN_MODIFIER res_float_upper_g = s21_sscanf_get_modifier('G');
+  MODIFIER res_float_upper_g = s21_sscanf_get_modifier('G');
   ck_assert_uint_eq(res_float_upper_g, FLOAT);
 
-  SCAN_MODIFIER res_octal = s21_sscanf_get_modifier('o');
+  MODIFIER res_octal = s21_sscanf_get_modifier('o');
   ck_assert_uint_eq(res_octal, UOCTAL);
-  SCAN_MODIFIER res_string = s21_sscanf_get_modifier('s');
+  MODIFIER res_string = s21_sscanf_get_modifier('s');
   ck_assert_uint_eq(res_string, STRING);
-  SCAN_MODIFIER res_udecimal = s21_sscanf_get_modifier('u');
+  MODIFIER res_udecimal = s21_sscanf_get_modifier('u');
   ck_assert_uint_eq(res_udecimal, UDECIMAL);
 
-  SCAN_MODIFIER res_uhex = s21_sscanf_get_modifier('x');
+  MODIFIER res_uhex = s21_sscanf_get_modifier('x');
   ck_assert_uint_eq(res_uhex, UHEX);
-  SCAN_MODIFIER res_upper_uhex = s21_sscanf_get_modifier('X');
+  MODIFIER res_upper_uhex = s21_sscanf_get_modifier('X');
   ck_assert_uint_eq(res_upper_uhex, UHEX);
 
-  SCAN_MODIFIER res_pointer = s21_sscanf_get_modifier('p');
+  MODIFIER res_pointer = s21_sscanf_get_modifier('p');
   ck_assert_uint_eq(res_pointer, POINTER);
-  SCAN_MODIFIER res_number = s21_sscanf_get_modifier('n');
+  MODIFIER res_number = s21_sscanf_get_modifier('n');
   ck_assert_uint_eq(res_number, NUMBER);
-  SCAN_MODIFIER res_percent = s21_sscanf_get_modifier('%');
+  MODIFIER res_percent = s21_sscanf_get_modifier('%');
   ck_assert_uint_eq(res_percent, PERCENT);
 }
 END_TEST

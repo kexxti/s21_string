@@ -6,23 +6,8 @@
 #include <stdarg.h>
 #include <stdio.h>  // for EOF
 
+#include "s21_formatting.h"
 #include "s21_string.h"
-
-typedef enum SCAN_MODIFIER {
-  ERR,
-  CHAR,
-  DECIMAL,
-  INTEGER,
-  FLOAT,
-  UOCTAL,
-  STRING,
-  UDECIMAL,
-  UHEX,
-  POINTER,
-  NUMBER,
-  PERCENT  // can't ignore it, behaves as normal symbol
-} SCAN_MODIFIER;
-typedef enum SCAN_LENGTH { NONE, SHORT, LONG, EXTENDED_DOUBLE } SCAN_LENGTH;
 typedef struct scan_format {
   bool is_symbol;        // if *char* in format without % then it is read as is,
   char matching_symbol;  // if *char* and the read one differ scan fails
@@ -30,16 +15,16 @@ typedef struct scan_format {
   bool ignore_whitespaces;
   bool ignore;
   s21_size_t width;
-  SCAN_LENGTH length_modifier;
-  SCAN_MODIFIER type_modifier;
+  LENGTH length_modifier;
+  MODIFIER type_modifier;
 } scan_format;
 
 int s21_sscanf(const char *str, const char *format, ...);
 scan_format *s21_sscanf_init_format();
 void s21_sscanf_fill_format_default(scan_format *settings);
 void s21_sscanf_read_format(const char **format, scan_format *settings);
-SCAN_LENGTH s21_sscanf_get_length(const char ch);
-SCAN_MODIFIER s21_sscanf_get_modifier(const char ch);
+LENGTH s21_sscanf_get_length(const char ch);
+MODIFIER s21_sscanf_get_modifier(const char ch);
 s21_size_t s21_sscanf_get_width(const char **format);
 void s21_sscanf_normalize_format(scan_format *settings);
 bool s21_sscanf_needs_dest(scan_format *settings);

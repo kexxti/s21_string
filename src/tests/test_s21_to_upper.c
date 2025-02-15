@@ -1,7 +1,5 @@
 #include "test_s21_to_upper.h"
 
-#include <check.h>
-
 START_TEST(test_to_upper_empty) {
   const char *str = "";
   char *res_s21 = s21_to_upper(str);

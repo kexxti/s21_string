@@ -48,7 +48,7 @@ void s21_sscanf_fill_format_default(scan_format *settings) {
   settings->ignore = false;
   settings->width = 0;
   settings->length_modifier = NONE;
-  settings->type_modifier = ERR;
+  settings->type_modifier = SYMBOL;
 }
 
 void s21_sscanf_read_format(const char **format, scan_format *settings) {
@@ -71,13 +71,13 @@ void s21_sscanf_read_format(const char **format, scan_format *settings) {
     settings->length_modifier = s21_sscanf_get_length(**format);
     if (settings->length_modifier) (*format)++;
     settings->type_modifier =
-        s21_sscanf_get_modifier(**format);  // what if ERR ? !!!
+        s21_sscanf_get_modifier(**format);  // what if SYMBOL ? !!!
     if (settings->type_modifier) (*format)++;
   }
 }
 
-SCAN_LENGTH s21_sscanf_get_length(const char ch) {
-  SCAN_LENGTH mod = NONE;
+LENGTH s21_sscanf_get_length(const char ch) {
+  LENGTH mod = NONE;
   if (ch == 'h')
     mod = SHORT;
   else if (ch == 'l')
@@ -87,8 +87,8 @@ SCAN_LENGTH s21_sscanf_get_length(const char ch) {
   return mod;
 }
 
-SCAN_MODIFIER s21_sscanf_get_modifier(const char ch) {
-  SCAN_MODIFIER mod = ERR;
+MODIFIER s21_sscanf_get_modifier(const char ch) {
+  MODIFIER mod = SYMBOL;
   if (ch == 'c')
     mod = CHAR;
   else if (ch == 'd')
