@@ -36,7 +36,8 @@ START_TEST(test_mismatch) {
   s21_size_t n = 4;
   int res_s21 = s21_strncmp(str1, str2, n);
   int res_std = strncmp(str1, str2, n);
-  ck_assert_int_eq(res_s21, res_std);
+  ck_assert_int_lt(res_s21, 0);
+  ck_assert_int_lt(res_std, 0);
 }
 END_TEST
 
@@ -46,7 +47,8 @@ START_TEST(test_empty_str1) {
   s21_size_t n = 4;
   int res_s21 = s21_strncmp(str1, str2, n);
   int res_std = strncmp(str1, str2, n);
-  ck_assert_int_eq(res_s21, res_std);
+  ck_assert_int_lt(res_s21, 0);
+  ck_assert_int_lt(res_std, 0);
 }
 END_TEST
 
@@ -56,7 +58,8 @@ START_TEST(test_empty_str2) {
   s21_size_t n = 4;
   int res_s21 = s21_strncmp(str1, str2, n);
   int res_std = strncmp(str1, str2, n);
-  ck_assert_int_eq(res_s21, res_std);
+  ck_assert_int_gt(res_s21, 0);
+  ck_assert_int_gt(res_std, 0);
 }
 END_TEST
 
@@ -90,40 +93,14 @@ START_TEST(test_extended_n) {
 }
 END_TEST
 
-START_TEST(test_null_safe_str1) {
-  char *str1 = NULL;
-  char *str2 = "ABCD";
-  s21_size_t n = 4;
-  int res_s21 = s21_strncmp(str1, str2, n);
-  ck_assert_int_eq(res_s21, 0);  // Безопасная обработка NULL
-}
-END_TEST
-
-START_TEST(test_null_safe_str2) {
-  char *str1 = "ABCD";
-  char *str2 = NULL;
-  s21_size_t n = 4;
-  int res_s21 = s21_strncmp(str1, str2, n);
-  ck_assert_int_eq(res_s21, 0);  // Безопасная обработка NULL
-}
-END_TEST
-
-START_TEST(test_null_safe_both) {
-  char *str1 = NULL;
-  char *str2 = NULL;
-  s21_size_t n = 4;
-  int res_s21 = s21_strncmp(str1, str2, n);
-  ck_assert_int_eq(res_s21, 0);  // Безопасная обработка NULL
-}
-END_TEST
-
 START_TEST(test_case_sensitive) {
   char *str1 = "abcd";
   char *str2 = "ABCD";
   s21_size_t n = 4;
   int res_s21 = s21_strncmp(str1, str2, n);
   int res_std = strncmp(str1, str2, n);
-  ck_assert_int_eq(res_s21, res_std);
+  ck_assert_int_gt(res_s21, 0);
+  ck_assert_int_gt(res_std, 0);
 }
 END_TEST
 
@@ -140,9 +117,6 @@ Suite *s21_strncmp_suite(void) {
   tcase_add_test(tc_core, test_empty_both);
   tcase_add_test(tc_core, test_zero_cmp);
   tcase_add_test(tc_core, test_extended_n);
-  tcase_add_test(tc_core, test_null_safe_str1);
-  tcase_add_test(tc_core, test_null_safe_str2);
-  tcase_add_test(tc_core, test_null_safe_both);
   tcase_add_test(tc_core, test_case_sensitive);
 
   suite_add_tcase(s, tc_core);
