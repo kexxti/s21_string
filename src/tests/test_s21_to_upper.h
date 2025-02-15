@@ -3,6 +3,7 @@
 
 #include <check.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../string/s21_string.h"
 

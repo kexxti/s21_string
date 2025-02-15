@@ -4,9 +4,6 @@
 typedef unsigned long long s21_size_t;
 #define S21_NULL ((void *)0)
 
-#include <stdbool.h>
-#include <stdlib.h>
-
 /*Searches for the first occurrence of the character c (an unsigned char)
 in the first n bytes of the string pointed to, by the argument str.*/
 void *s21_memchr(const void *str, int c, s21_size_t n);

@@ -4,7 +4,9 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>  // for EOF
+#include <stdlib.h>
 
 #include "s21_formatting.h"
 #include "s21_string.h"
